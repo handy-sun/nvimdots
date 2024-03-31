@@ -1,0 +1,3 @@
+[submodule "lua/user"]
+	path = lua/user
+	url = git@github.com:handy-sun/nvimdots.user.git
