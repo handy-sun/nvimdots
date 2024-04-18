@@ -12,13 +12,13 @@ lang["fatih/vim-go"] = {
 	lazy = true,
 	ft = "go",
 	build = ":GoInstallBinaries",
-	config = require("lang.vim-go"),
+	init = require("lang.vim-go"),
 }
 lang["mrcjkb/rustaceanvim"] = {
 	lazy = true,
 	ft = "rust",
 	version = "^3",
-	config = require("lang.rust"),
+	init = require("lang.rust"),
 	dependencies = { "nvim-lua/plenary.nvim" },
 }
 lang["Saecki/crates.nvim"] = {
