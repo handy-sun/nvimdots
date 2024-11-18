@@ -65,3 +65,65 @@ _G._toggle_lazygit = function()
 		vim.notify("Command [lazygit] not found!", vim.log.levels.ERROR, { title = "toggleterm.nvim" })
 	end
 end
+
+_G._toggle_inlayhint = function()
+	if vim.lsp.inlay_hint.is_enabled() then
+		vim.lsp.inlay_hint.enable(false)
+		vim.notify("Disable inlay hint successfully!", vim.log.levels.INFO, { title = "LSP Inlay Hint" })
+	else
+		vim.lsp.inlay_hint.enable(true)
+		vim.notify("Enable inlay hint successfully!", vim.log.levels.INFO, { title = "LSP Inlay Hint" })
+	end
+end
+
+local _diagnostic = 1
+_G._toggle_diagnostic = function()
+	if vim.diagnostic.is_enabled() then
+		if _diagnostic == 1 then
+			_diagnostic = 0
+			vim.diagnostic.hide()
+			vim.notify("Hide virtual text successfully!", vim.log.levels.INFO, { title = "LSP Diagnostic" })
+		else
+			_diagnostic = 1
+			vim.diagnostic.show()
+			vim.notify("Show virtual text successfully!", vim.log.levels.INFO, { title = "LSP Diagnostic" })
+		end
+	end
+end
+
+_G._async_compile_and_debug = function()
+	local file_ext = vim.fn.expand("%:e")
+	local file_path = vim.fn.expand("%:p")
+	local out_name = vim.fn.expand("%:p:h") .. "/" .. vim.fn.expand("%:t:r") .. ".out"
+	local compile_cmd
+	if file_ext == "cpp" or file_ext == "cc" then
+		compile_cmd = string.format("g++ -g %s -o %s", file_path, out_name)
+	elseif file_ext == "c" then
+		compile_cmd = string.format("gcc -g %s -o %s", file_path, out_name)
+	elseif file_ext == "go" then
+		compile_cmd = string.format("go build -o %s %s", out_name, file_path)
+	else
+		require("dap").continue()
+		return
+	end
+	local notify_title = "Debug Pre-compile"
+	vim.fn.jobstart(compile_cmd, {
+		on_exit = function(_, exit_code, _)
+			if exit_code == 0 then
+				vim.notify(
+					"Compilation succeeded! Executable: " .. out_name,
+					vim.log.levels.INFO,
+					{ title = notify_title }
+				)
+				require("dap").continue()
+				return
+			else
+				vim.notify(
+					"Compilation failed with exit code: " .. exit_code,
+					vim.log.levels.ERROR,
+					{ title = notify_title }
+				)
+			end
+		end,
+	})
+end
