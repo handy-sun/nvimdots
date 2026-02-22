@@ -1,21 +1,23 @@
 return function()
-	local trouble_filter = function(position)
+	local function trouble_filter(position)
 		return function(_, win)
-			return vim.w[win].trouble
-				and vim.w[win].trouble.position == position
-				and vim.w[win].trouble.type == "split"
-				and vim.w[win].trouble.relative == "editor"
+			local tw = vim.w[win].trouble
+			return tw
+				and tw.position == position
+				and tw.type == "split"
+				and tw.relative == "editor"
 				and not vim.w[win].trouble_preview
 		end
 	end
 
 	require("modules.utils").load_plugin("edgy", {
+		animate = { enabled = false },
 		close_when_all_hidden = true,
 		exit_when_last = true,
 		wo = { winbar = false },
 		keys = {
-			["q"] = false,
-			["Q"] = false,
+			q = false,
+			Q = false,
 			["<C-q>"] = false,
 			["<A-j>"] = function(win)
 				win:resize("height", -2)
@@ -30,13 +32,34 @@ return function()
 				win:resize("width", 2)
 			end,
 		},
+		left = {
+			{
+				ft = "NvimTree",
+				pinned = true,
+				collapsed = false,
+				size = { height = 0.6, width = 0.15 },
+				open = "NvimTreeOpen",
+			},
+			{
+				ft = "trouble",
+				pinned = true,
+				collapsed = false,
+				size = { height = 0.4, width = 0.15 },
+				open = function()
+					return vim.b.buftype == "" and "Trouble symbols toggle win.position=right"
+				end,
+				filter = trouble_filter("right"),
+			},
+		},
 		bottom = {
 			{ ft = "qf", size = { height = 0.3 } },
 			{
 				ft = "toggleterm",
 				size = { height = 0.3 },
 				filter = function(_, win)
-					return vim.w[win].relative == ""
+					local cfg = vim.api.nvim_win_get_config(win)
+					local term = require("toggleterm.terminal").get(1)
+					return cfg.relative == "" and term and term.direction == "horizontal"
 				end,
 			},
 			{
@@ -47,30 +70,14 @@ return function()
 				end,
 			},
 		},
-		left = {
-			{
-				ft = "NvimTree",
-				pinned = true,
-				open = "NvimTreeOpen",
-				size = { width = 30 },
-			},
-		},
 		right = {
 			{
-				ft = "trouble",
+				ft = "codecompanion",
 				pinned = true,
-				size = { height = 0.6, width = 0.3 },
-				open = "Trouble symbols toggle win.position=right",
-				filter = trouble_filter("right"),
-			},
-			{
-				ft = "trouble",
-				pinned = true,
-				collapsed = true,
-				size = { height = 0.4, width = 0.3 },
-				open = "Trouble lsp toggle win.position=right",
-				filter = trouble_filter("right"),
+				collapsed = false,
+				size = { width = 0.25 },
+				open = "CodeCompanionChat Toggle",
 			},
 		},
-	}, false, nil, true)
+	})
 end

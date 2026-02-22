@@ -19,10 +19,10 @@ editor["m4xshen/autoclose.nvim"] = {
 	event = "InsertEnter",
 	config = require("editor.autoclose"),
 }
-editor["LunarVim/bigfile.nvim"] = {
+editor["pteroctopus/faster.nvim"] = {
 	lazy = false,
-	config = require("editor.bigfile"),
 	cond = require("core.settings").load_big_files_faster,
+	config = require("editor.faster"),
 }
 editor["ojroques/nvim-bufdel"] = {
 	lazy = true,
@@ -55,16 +55,16 @@ editor["echasnovski/mini.align"] = {
 	event = { "CursorHold", "CursorHoldI" },
 	config = require("editor.align"),
 }
+editor["echasnovski/mini.cursorword"] = {
+	lazy = true,
+	event = { "BufReadPost", "BufAdd", "BufNewFile" },
+	config = require("editor.cursorword"),
+}
 editor["smoka7/hop.nvim"] = {
 	lazy = true,
 	version = "*",
 	event = { "CursorHold", "CursorHoldI" },
 	config = require("editor.hop"),
-}
-editor["tzachar/local-highlight.nvim"] = {
-	lazy = true,
-	event = { "BufReadPost", "BufAdd", "BufNewFile" },
-	config = require("editor.local-highlight"),
 }
 editor["brenoprata10/nvim-highlight-colors"] = {
 	lazy = true,
@@ -93,24 +93,32 @@ editor["MagicDuck/grug-far.nvim"] = {
 --                  :treesitter related plugins                    --
 ----------------------------------------------------------------------
 editor["nvim-treesitter/nvim-treesitter"] = {
-	lazy = true,
+	lazy = false, -- nvim-ts cannot lazy load now
+	branch = "main",
 	build = function()
 		if #vim.api.nvim_list_uis() > 0 then
 			vim.api.nvim_command([[TSUpdate]])
 		end
 	end,
-	event = "BufReadPre",
 	config = require("editor.treesitter"),
 	dependencies = {
-		{ "andymass/vim-matchup" },
 		{ "mfussenegger/nvim-treehopper" },
-		{ "nvim-treesitter/nvim-treesitter-textobjects" },
+		{
+			"nvim-treesitter/nvim-treesitter-textobjects",
+			branch = "main",
+			config = require("editor.ts-textobjects"),
+		},
+		{
+			"andymass/vim-matchup",
+			init = require("editor.matchup"),
+		},
 		{
 			"windwp/nvim-ts-autotag",
 			config = require("editor.autotag"),
 		},
 		{
 			"hiphish/rainbow-delimiters.nvim",
+			submodules = false,
 			config = require("editor.rainbow_delims"),
 		},
 		{

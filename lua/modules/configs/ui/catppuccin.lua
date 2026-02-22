@@ -1,6 +1,6 @@
 return function()
-	local transparent_background = require("core.settings").transparent_background
 	local clear = {}
+	local transparent_background = require("core.settings").transparent_background
 
 	require("modules.utils").load_plugin("catppuccin", {
 		background = { light = "latte", dark = "mocha" }, -- latte, frappe, macchiato, mocha
@@ -41,13 +41,12 @@ return function()
 			gitsigns = true,
 			grug_far = true,
 			hop = true,
-			illuminate = true,
 			indent_blankline = { enabled = true, colored_indent_levels = true },
 			lsp_saga = true,
 			lsp_trouble = true,
 			markdown = true,
 			mason = true,
-			mini = { enabled = true, indentscope_color = "" },
+			mini = { enabled = true },
 			native_lsp = {
 				enabled = true,
 				virtual_text = {

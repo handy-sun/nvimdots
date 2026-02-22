@@ -104,7 +104,7 @@ end
 -- NOTE: If the active colorscheme isn't `catppuccin`, this function won't overwrite existing definitions
 ---Sets a global highlight group.
 ---@param name string @Highlight group name, e.g. "ErrorMsg"
----@param foreground string @The foreground color
+---@param foreground? string @The foreground color
 ---@param background? string @The background color
 ---@param italic? boolean
 local function set_global_hl(name, foreground, background, italic)
@@ -133,6 +133,24 @@ function M.blend(foreground, background, alpha)
 	return string.format("#%02x%02x%02x", blend_channel(1), blend_channel(2), blend_channel(3))
 end
 
+---Darken a color by blending it with the background color.
+---@param hex string @The color in hex to darken
+---@param amount number @The amount to darken the color
+---@param bg string @The background color to blend with
+---@return string @The darkened color as a hex string
+function M.darken(hex, amount, bg)
+	return M.blend(hex, bg or "#000000", math.abs(amount))
+end
+
+---Lighten a color by blending it with the foreground color.
+---@param hex string @The color in hex to lighten
+---@param amount number @The amount to lighten the color
+---@param fg string @The foreground color to blend with
+---@return string @The lightened color as a hex string
+function M.lighten(hex, amount, fg)
+	return M.blend(hex, fg or "#FFFFFF", math.abs(amount))
+end
+
 ---Get RGB highlight by highlight group
 ---@param hl_group string @Highlight group name
 ---@param use_bg boolean @Returns background or not
@@ -143,10 +161,7 @@ function M.hl_to_rgb(hl_group, use_bg, fallback_hl)
 	local hlexists = pcall(vim.api.nvim_get_hl, 0, { name = hl_group, link = false })
 
 	if hlexists then
-		-- FIXME: Investigate why hl-StatusLine is undefined in toggleterm and remove this workaround
-		-- (@Jint-lzxy)
-		local link = vim.bo.filetype == "toggleterm"
-		local result = vim.api.nvim_get_hl(0, { name = hl_group, link = link })
+		local result = vim.api.nvim_get_hl(0, { name = hl_group, link = false })
 		if use_bg then
 			hex = result.bg and string.format("#%06x", result.bg) or "NONE"
 		else
@@ -169,6 +184,7 @@ function M.extend_hl(name, def)
 	local current_def = vim.api.nvim_get_hl(0, { name = name, link = false })
 	local combined_def = vim.tbl_deep_extend("force", current_def, def)
 
+	---@diagnostic disable-next-line: param-type-mismatch
 	vim.api.nvim_set_hl(0, name, combined_def)
 end
 
@@ -177,7 +193,7 @@ end
 ---@return palette
 function M.get_palette(overwrite)
 	if not overwrite then
-		return vim.deepcopy(init_palette())
+		return vim.deepcopy(init_palette(), true)
 	else
 		return vim.tbl_extend("force", init_palette(), overwrite)
 	end
@@ -238,6 +254,28 @@ function M.gen_alpha_hl()
 	set_global_hl("AlphaFooter", colors.yellow)
 end
 
+-- Generate highlight groups for cursorword. Existing attributes will NOT be overwritten
+function M.gen_cursorword_hl()
+	local colors = M.get_palette()
+
+	-- Do not highlight `MiniCursorwordCurrent`
+	set_global_hl("MiniCursorword", nil, M.darken(colors.surface1, 0.7, colors.base))
+	set_global_hl("MiniCursorwordCurrent", nil)
+end
+
+---Setup and enable a language server in one call.
+---@param server string @Name of the language server
+---@param config? vim.lsp.Config @Optional config to apply
+function M.register_server(server, config)
+	vim.validate("server", server, "string", false)
+	vim.validate("config", config, "table", true)
+
+	if config then
+		vim.lsp.config(server, config)
+	end
+	vim.lsp.enable(server)
+end
+
 ---Convert number (0/1) to boolean
 ---@param value number @The value to check
 ---@return boolean|nil @Returns nil if failed
@@ -292,8 +330,7 @@ end
 ---@param opts nil|table @The default config to be merged with
 ---@param vim_plugin? boolean @If this plugin is written in vimscript or not
 ---@param setup_callback? function @Add new callback if the plugin needs unusual setup function
----@param overwrite? boolean @If load user table-type config by overwriting
-function M.load_plugin(plugin_name, opts, vim_plugin, setup_callback, overwrite)
+function M.load_plugin(plugin_name, opts, vim_plugin, setup_callback)
 	vim_plugin = vim_plugin or false
 
 	-- Get the file name of the default config
@@ -326,11 +363,7 @@ function M.load_plugin(plugin_name, opts, vim_plugin, setup_callback, overwrite)
 			if ok then
 				-- Extend base config if the returned user config is a table
 				if type(user_config) == "table" then
-					if overwrite == true then
-						opts = vim.tbl_deep_extend("force", opts, user_config)
-					else
-						opts = tbl_recursive_merge(opts, user_config)
-					end
+					opts = tbl_recursive_merge(opts, user_config)
 					setup_callback(opts)
 				-- Replace base config if the returned user config is a function
 				elseif type(user_config) == "function" then
