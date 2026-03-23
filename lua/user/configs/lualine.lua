@@ -98,7 +98,6 @@ return {
 					'datetime',
 					style = '%H:%M',
 					padding = { right = 1 },
-
 				},
 			}
 		end,

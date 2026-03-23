@@ -15,10 +15,6 @@ mappings["plug_map"] = {
 	-- !! Disable these mappings
 	["n|<C-s>"] = "",
 	["n|<Esc>"] = "",
-	-- ["n|<M-h>"] = "",
-	-- ["n|<M-l>"] = "",
-	-- ["n|<M-j>"] = "",
-	-- ["n|<M-k>"] = "",
 	["n|<C-q>"] = "",
 	["n|<M-S-q>"] = "",
 	["v|J"] = "",
@@ -44,17 +40,16 @@ mappings["plug_map"] = {
 	-- ["n|[<space>"] = map_cu("exe 'normal! i' . repeat(nr2char(32), v:count1)"):with_noremap():with_desc("edit: Insert [count] space(s) behind the cursor(cursor move with the old colmun)"),
 	-- TODO: how to use range
 	["n|]<space>"] = map_cmd("my:<C-u>exe 'normal! a '<CR>`y"):with_noremap():with_silent():with_desc("edit: Append space after the cursor(cursor postion donnot modify)"),
-	["n|<leader>-"] = map_cu("exe v:count1 . 'bprevious'"):with_noremap():with_silent():with_desc("buffer: Switch to [count] prev"),
-	["n|<leader>="] = map_cu("exe v:count1 . 'bnext'"):with_noremap():with_silent():with_desc("buffer: Switch to [count] next"),
+	["n|<leader><Left>"] = map_cu("exe v:count1 . 'bprevious'"):with_noremap():with_silent():with_desc("buffer: Switch to [count] prev"),
+	["n|<leader><Right>"] = map_cu("exe v:count1 . 'bnext'"):with_noremap():with_silent():with_desc("buffer: Switch to [count] next"),
 	["n|z["] = map_cu("exe v:count1 . 'cprevious'"):with_noremap():with_silent():with_desc("quickfix: move [count] prev"),
 	["n|z]"] = map_cu("exe v:count1 . 'cnext'"):with_noremap():with_silent():with_desc("quickfix: move [count] next"),
-	-- Resize window
 	-- Save and quit
 	["n|<leader><space>"] = map_cr("w"):with_noremap():with_silent():with_desc("edit: Save file"),
 	["n|<leader>q"] = map_cr("wq"):with_desc("edit: Save file and quit"),
 	["n|<leader><BS>"] = map_cr("wqa"):with_desc("edit: Save All file(s) and quit"),
 	["n|<leader>e"] = map_cr("q!"):with_desc("edit: Force quit"),
-	["n|<leader><Tab>"] = map_cmd("@=((foldclosed(line('.')) < 0) ? 'zc' : 'zo')<CR>"):with_silent():with_desc("ui: Fold Toggle"),
+	["n|zx"] = map_cmd("@=((foldclosed(line('.')) < 0) ? 'zc' : 'zo')<CR>"):with_silent():with_desc("ui: Fold Toggle"),
 	-- Quickly copy/paste and search/replace
 	["n|sc"] = map_cmd('"ayiw'):with_noremap():with_desc("yank a word into register a"),
 	["n|sv"] = map_cmd('viw"ap'):with_noremap():with_desc("paste override a word with register a"),
@@ -74,7 +69,7 @@ mappings["plug_map"] = {
 	["n|z'"] = map_cr("registers"):with_noremap():with_desc("command: Show all registers"),
 	["n|zm"] = map_cr("marks"):with_noremap():with_desc("command: Show all marks"),
 	-- not show ls output on nivm 
-	-- ["n|zl"] = map_cmd(":ls<CR>:b"):with_noremap():with_desc("command: Show all buffers and select one"),
+	["n|zl"] = map_cmd(":ls<CR>"):with_noremap():with_desc("command: Show all buffers and select one"),
 	-- Edit file
 	["n|<leader>W"] = map_cmd(":%s/\\s\\+$//<CR>"):with_noremap():with_desc("edit: Trim EOL trailing space"),
 	["n|<leader><CR>"] = map_cmd("i<CR><Esc>k$"):with_noremap():with_desc("edit: Break this line and move right content to next line"),

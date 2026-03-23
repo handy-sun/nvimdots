@@ -4,7 +4,7 @@ local settings = {}
 -- If cannot connect to port 22, set false
 settings["use_ssh"] = true
 
-settings["use_copilot"] = false
+settings["use_copilot"] = true
 -- Set it to false if there are no need to format on save.
 ---@type boolean
 settings["format_on_save"] = false
