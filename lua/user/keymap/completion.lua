@@ -70,6 +70,7 @@ mappings["plug_map"] = {
 	["n|zm"] = map_cr("marks"):with_noremap():with_desc("command: Show all marks"),
 	-- not show ls output on nivm 
 	["n|zl"] = map_cmd(":ls<CR>"):with_noremap():with_desc("command: Show all buffers and select one"),
+	["n|df"] = map_cr("bdelete"):with_noremap():with_desc("command: Delete current buffer"),
 	-- Edit file
 	["n|<leader>W"] = map_cmd(":%s/\\s\\+$//<CR>"):with_noremap():with_desc("edit: Trim EOL trailing space"),
 	["n|<leader><CR>"] = map_cmd("i<CR><Esc>k$"):with_noremap():with_desc("edit: Break this line and move right content to next line"),
