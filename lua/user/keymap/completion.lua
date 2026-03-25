@@ -45,7 +45,7 @@ mappings["plug_map"] = {
 	["n|z["] = map_cu("exe v:count1 . 'cprevious'"):with_noremap():with_silent():with_desc("quickfix: move [count] prev"),
 	["n|z]"] = map_cu("exe v:count1 . 'cnext'"):with_noremap():with_silent():with_desc("quickfix: move [count] next"),
 	-- Save and quit
-	["n|<leader><space>"] = map_cr("w"):with_noremap():with_silent():with_desc("edit: Save file"),
+	["n|<leader>2"] = map_cr("w"):with_noremap():with_silent():with_desc("edit: Save file"),
 	["n|<leader>q"] = map_cr("wq"):with_desc("edit: Save file and quit"),
 	["n|<leader><BS>"] = map_cr("wqa"):with_desc("edit: Save All file(s) and quit"),
 	["n|<leader>e"] = map_cr("q!"):with_desc("edit: Force quit"),
@@ -60,17 +60,18 @@ mappings["plug_map"] = {
 	["n|s/"] = map_cmd(":%s/<C-R>//"):with_noremap():with_desc("replace search word"),
 	["n|sr"] = map_cmd(":%s/\\<<C-R><C-W>\\>/"):with_noremap():with_desc("replace the word under the cursor"),
 	-- split 4 pos window and fill with absolute path of current file
-	["n|se"] = map_cmd(":e <C-R>=expand('%:p:h') . '/' <CR>"):with_noremap():with_desc("edit another file fill absolute path"),
-	["n|sh"] = map_cmd(":setlocal nosplitright<CR>:vsplit <C-R>=expand('%:p:h') . '/' <CR>"):with_noremap():with_desc("split left and fill absolute path"),
-	["n|sl"] = map_cmd(":setlocal splitright<CR>:vsplit <C-R>=expand('%:p:h') . '/' <CR>"):with_noremap():with_desc("split right and fill absolute path"),
-	["n|sk"] = map_cmd(":setlocal nosplitbelow<CR>:split <C-R>=expand('%:p:h') . '/' <CR>"):with_noremap():with_desc("split above and fill absolute path"),
-	["n|sj"] = map_cmd(":setlocal splitbelow<CR>:split <C-R>=expand('%:p:h') . '/' <CR>"):with_noremap():with_desc("split below and fill absolute path"),
+	["n|se"] = map_cmd(":e <C-R>=GetAbsFileDir()<CR>"):with_noremap():with_desc("edit another file fill absolute path"),
+	["n|sh"] = map_cmd(":setlocal nosplitright<CR>:vsplit <C-R>=GetAbsFileDir()<CR>"):with_noremap():with_desc("split left and fill absolute path"),
+	["n|sl"] = map_cmd(":setlocal splitright<CR>:vsplit <C-R>=GetAbsFileDir()<CR>"):with_noremap():with_desc("split right and fill absolute path"),
+	["n|sk"] = map_cmd(":setlocal nosplitbelow<CR>:split <C-R>=GetAbsFileDir()<CR>"):with_noremap():with_desc("split above and fill absolute path"),
+	["n|sj"] = map_cmd(":setlocal splitbelow<CR>:split <C-R>=GetAbsFileDir()<CR>"):with_noremap():with_desc("split below and fill absolute path"),
 	-- show registers, buffers, marks
 	["n|z'"] = map_cr("registers"):with_noremap():with_desc("command: Show all registers"),
 	["n|zm"] = map_cr("marks"):with_noremap():with_desc("command: Show all marks"),
-	-- not show ls output on nivm 
+	-- not show ls output on nivm
 	["n|zl"] = map_cmd(":ls<CR>"):with_noremap():with_desc("command: Show all buffers and select one"),
-	["n|df"] = map_cr("bdelete"):with_noremap():with_desc("command: Delete current buffer"),
+	["n|sd"] = map_cr("bdelete"):with_noremap():with_desc("command: Delete current buffer"),
+	["n|<Leader>cp"] = map_cmd(":CpGrep \"\" <C-R>=GetAbsFileDir()<CR><C-Left><Left><Left>"):with_noremap():with_desc("command: Grep in the current directory"),
 	-- Edit file
 	["n|<leader>W"] = map_cmd(":%s/\\s\\+$//<CR>"):with_noremap():with_desc("edit: Trim EOL trailing space"),
 	["n|<leader><CR>"] = map_cmd("i<CR><Esc>k$"):with_noremap():with_desc("edit: Break this line and move right content to next line"),
@@ -90,7 +91,7 @@ mappings["plug_map"] = {
 	["v|<S-Up>"] = map_cmd(":move '<-2<CR>gv"):with_desc("edit: Move select line(s) up"),
 	["v|<S-Down>"] = map_cmd(":move '>+<CR>gv"):with_desc("edit: Move select line(s) down"),
 	-- Command mode
-	["c|<C-t>"] = map_cmd("<C-R>=expand('%:p:h') . '/' <CR>"):with_noremap():with_silent():with_desc("command: Fill absolute path"),
+	["c|<C-t>"] = map_cmd("<C-R>=GetAbsFileDir()<CR>"):with_noremap():with_silent():with_desc("command: Fill absolute path"),
 	-- Copy to system clipboard
 	["n|ss"] = map_cmd('"*y'):with_noremap():with_desc("yank select pattern into system clipboard"),
 	["v|<leader><space>"] = map_cmd('"*y'):with_noremap():with_desc("yank select pattern into system clipboard"),

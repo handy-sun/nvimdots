@@ -27,4 +27,10 @@ vim.cmd([[
 command! -nargs=+ -complete=file CpGrep execute 'silent grep! <args>' | copen 9 | redraw!
 ]])
 
+vim.cmd([[
+function! GetAbsFileDir()
+    return expand('%:p:h') . '/'
+endfunction
+]])
+
 return options
