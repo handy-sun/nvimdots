@@ -44,7 +44,7 @@ settings["disabled_plugins"] = {
 	--- large version update bad
 	"andymass/vim-matchup",
 	"hiphish/rainbow-delimiters.nvim",
-	"gelguy/wilder.nvim"
+	-- "gelguy/wilder.nvim"
 	-- "hrsh7th/nvim-cmp"
 }
 -- Set the dashboard startup image here
