@@ -19,11 +19,7 @@ mappings["plug_map"] = {
 	["n|<M-S-q>"] = "",
 	["v|J"] = "",
 	["v|K"] = "",
-	-- noh
-	["n|<leader>s"] = map_callback(function()
-			_flash_esc_or_noh()
-		end)
-		:with_noremap():with_silent():with_desc("edit: Clear search highlight"),
+	["nv|<leader>2"] = map_cmd("<Cmd>HopWordMW<CR>"):with_noremap():with_desc("jump: Goto word"),
 	["n|<leader>/"] = map_cmd('gcc'):with_silent():with_desc("edit: Toggle comment for line (custom)"),
 	["n|gi"] = map_cr("Tagbar"):with_noremap():with_silent():with_desc("split left: Vista tagbar toggle"),
 	-- Swap these two origin mappings
@@ -45,11 +41,11 @@ mappings["plug_map"] = {
 	["n|z["] = map_cu("exe v:count1 . 'cprevious'"):with_noremap():with_silent():with_desc("quickfix: move [count] prev"),
 	["n|z]"] = map_cu("exe v:count1 . 'cnext'"):with_noremap():with_silent():with_desc("quickfix: move [count] next"),
 	-- Save and quit
-	["n|<leader>2"] = map_cr("w"):with_noremap():with_silent():with_desc("edit: Save file"),
-	["n|<leader>q"] = map_cr("wq"):with_desc("edit: Save file and quit"),
+	["n|<leader>w"] = map_cr("w"):with_noremap():with_silent():with_desc("edit: Save file"),
+	["n|<leader>q"] = map_cr("q"):with_desc("edit: Quit"),
 	["n|<leader><BS>"] = map_cr("wqa"):with_desc("edit: Save All file(s) and quit"),
-	["n|<leader>e"] = map_cr("q!"):with_desc("edit: Force quit"),
-	["n|zx"] = map_cmd("@=((foldclosed(line('.')) < 0) ? 'zc' : 'zo')<CR>"):with_silent():with_desc("ui: Fold Toggle"),
+	["n|<leader>Q"] = map_cr("q!"):with_desc("edit: Force quit"),
+	-- ["n|zx"] = map_cmd("@=((foldclosed(line('.')) < 0) ? 'zc' : 'zo')<CR>"):with_silent():with_desc("ui: Fold Toggle"),
 	-- Quickly copy/paste and search/replace
 	["n|sc"] = map_cmd('"ayiw'):with_noremap():with_desc("yank a word into register a"),
 	["n|sv"] = map_cmd('viw"ap'):with_noremap():with_desc("paste override a word with register a"),
