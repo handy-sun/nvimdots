@@ -25,6 +25,7 @@ mappings["plug_map"] = {
 	-- Swap these two origin mappings
 	["n|<C-i>"] = map_cr("BufferLineCyclePrev"):with_noremap():with_silent():with_desc("buffer: Switch to prev"),
 	["n|<C-o>"] = map_cr("BufferLineCycleNext"):with_noremap():with_silent():with_desc("buffer: Switch to next"),
+	["n|tc"] =  map_cr("tabclose"):with_desc("tab: Close current tab"),
 	-- Select all
 	["n|<C-a>"] = map_cmd("ggVG"):with_noremap():with_desc("Select all contents"),
 	["n|n"] = map_cmd("'Nn'[v:searchforward]"):with_noremap():with_expr():with_desc("Always search forward"),
@@ -34,7 +35,6 @@ mappings["plug_map"] = {
 	["n|]\\"] = map_cmd(":<C-u>put =repeat(nr2char(10), v:count1)<CR>"):with_noremap():with_silent():with_desc("edit: Append [count] line(s) below the current line"),
 	["n|[<space>"] = map_cmd(":<C-u>exe 'normal! i' . repeat(\' \', v:count1)<CR>l"):with_noremap():with_silent():with_desc("edit: Insert [count] space(s) behind the cursor(cursor move with the old colmun)"),
 	-- ["n|[<space>"] = map_cu("exe 'normal! i' . repeat(nr2char(32), v:count1)"):with_noremap():with_desc("edit: Insert [count] space(s) behind the cursor(cursor move with the old colmun)"),
-	-- TODO: how to use range
 	["n|]<space>"] = map_cmd("my:<C-u>exe 'normal! a '<CR>`y"):with_noremap():with_silent():with_desc("edit: Append space after the cursor(cursor postion donnot modify)"),
 	["n|<leader><Left>"] = map_cu("exe v:count1 . 'bprevious'"):with_noremap():with_silent():with_desc("buffer: Switch to [count] prev"),
 	["n|<leader><Right>"] = map_cu("exe v:count1 . 'bnext'"):with_noremap():with_silent():with_desc("buffer: Switch to [count] next"),

@@ -43,7 +43,7 @@ end
 settings["disabled_plugins"] = {
 	--- large version update bad
 	"andymass/vim-matchup",
-	"hiphish/rainbow-delimiters.nvim",
+	-- "hiphish/rainbow-delimiters.nvim",
 	-- "gelguy/wilder.nvim"
 	-- "hrsh7th/nvim-cmp"
 }
