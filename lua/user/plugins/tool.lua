@@ -53,4 +53,13 @@ tool["folke/which-key.nvim"] = {
 -- 	end
 -- }
 
+tool["handy-sun/wilder.nvim"] = {
+	name = "wilder",
+	branch = "fix/nvim-0.12-e704",
+	lazy = true,
+	event = "CmdlineEnter",
+	config = require("user.configs.wilder"),
+	dependencies = "romgrk/fzy-lua-native",
+}
+
 return tool

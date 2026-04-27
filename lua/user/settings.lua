@@ -43,9 +43,9 @@ end
 settings["disabled_plugins"] = {
 	--- large version update bad
 	"andymass/vim-matchup",
-	-- "hiphish/rainbow-delimiters.nvim",
-	-- "gelguy/wilder.nvim"
-	-- "hrsh7th/nvim-cmp"
+	"hiphish/rainbow-delimiters.nvim",
+	--- E704 on nvim 0.12+, replaced by handy-sun fork
+	"gelguy/wilder.nvim",
 }
 -- Set the dashboard startup image here
 -- You can generate the ascii image using: https://github.com/TheZoraiz/ascii-image-converter
