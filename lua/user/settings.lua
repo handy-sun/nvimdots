@@ -27,6 +27,31 @@ settings["lsp_deps"] = function(defaults)
 	}
 end
 
+-- Treesitter parsers to install during bootstrap.
+-- Use function to replace the default list (table would be appended, not replaced).
+---@type string[]
+settings["treesitter_deps"] = function()
+	return {
+		"bash",
+		"c",
+		"cpp",
+		"css",
+		"html",
+		"javascript",
+		"json",
+		"latex",
+		"lua",
+		"make",
+		"markdown",
+		"markdown_inline",
+		"python",
+		"rust",
+		"typescript",
+		"vimdoc",
+		"yaml",
+	}
+end
+
 -- General-purpose sources for none-ls to install during bootstrap.
 -- Supported sources: https://github.com/nvimtools/none-ls.nvim/tree/main/lua/null-ls/builtins
 ---@type string[]
