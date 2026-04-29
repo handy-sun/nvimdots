@@ -44,6 +44,7 @@ settings["treesitter_deps"] = function()
 		"make",
 		"markdown",
 		"markdown_inline",
+		"nix",
 		"python",
 		"rust",
 		"typescript",

@@ -58,7 +58,25 @@ local custom = {
 	},
 }
 
+local BLUE_END = "#79a0ee"
+
+local function theme_with_blue_ends()
+	local theme = require("lualine.utils.loader").load_theme(vim.g.colors_name) or require("lualine.themes.auto")
+	for _, mode in ipairs({ "normal", "command", "insert", "visual", "terminal", "replace" }) do
+		if type(theme[mode]) == "table" and type(theme[mode].a) == "table" then
+			theme[mode].a.bg = BLUE_END
+		end
+	end
+	if type(theme.inactive) == "table" and type(theme.inactive.a) == "table" then
+		theme.inactive.a.bg = BLUE_END
+	end
+	return theme
+end
+
 return {
+	options = {
+		theme = theme_with_blue_ends(),
+	},
 	sections = {
 		lualine_b = function(defaults)
 			return {
@@ -104,4 +122,3 @@ return {
 	},
 }
 -- end
-
