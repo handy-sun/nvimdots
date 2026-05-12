@@ -97,6 +97,18 @@ ui['folke/noice.nvim'] = {
 				enabled = true,
 				view = "cmdline_popup",
 			},
+			messages = {
+				enabled = true,
+				view = "mini",
+				view_error = "mini",
+				view_warn = "mini",
+				view_history = "mini",
+				view_search = "mini",
+			},
+			notify = {
+				enabled = true,
+				view = "mini",
+			},
 			views = {
 				cmdline_popup = {
 					position = {
@@ -108,6 +120,21 @@ ui['folke/noice.nvim'] = {
 						width = "auto",
 						height = "auto",
 					},
+				},
+			},
+			routes = {
+				{
+					view = "mini",
+					filter = {
+						any = {
+							{ event = "msg_show" },
+							{ event = "msg_showmode" },
+							{ event = "msg_showcmd" },
+							{ event = "msg_ruler" },
+							{ event = "notify" },
+						},
+					},
+					opts = { replace = true, merge = true },
 				},
 			},
 			lsp = {
