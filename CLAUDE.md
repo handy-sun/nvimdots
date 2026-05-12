@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-这是一个 Neovim 配置（fork 自 [ayamir/nvimdots](https://github.com/ayamir/nvimdots)），目标版本为 Neovim 0.11 stable。插件由 [lazy.nvim](https://github.com/folke/lazy.nvim) 管理。
+这是一个 Neovim 配置（fork 自 [ayamir/nvimdots](https://github.com/ayamir/nvimdots)），目标版本为 Neovim 0.12 stable。插件由 [lazy.nvim](https://github.com/folke/lazy.nvim) 管理。
 
 ## 代码格式化
 
