@@ -60,22 +60,35 @@ local custom = {
 
 local BLUE_END = "#79a0ee"
 
-local function theme_with_blue_ends()
+local function custom_theme()
+	vim.api.nvim_create_autocmd("ColorScheme", {
+		group = vim.api.nvim_create_augroup("LualineColorScheme", { clear = true }),
+		pattern = "*",
+		callback = function()
+			require("lualine").setup({ options = { theme = custom_theme() } })
+		end,
+	})
+
 	local theme = require("lualine.utils.loader").load_theme(vim.g.colors_name) or require("lualine.themes.auto")
-	for _, mode in ipairs({ "normal", "command", "insert", "visual", "terminal", "replace" }) do
-		if type(theme[mode]) == "table" and type(theme[mode].a) == "table" then
-			theme[mode].a.bg = BLUE_END
-		end
+	local colors = require("modules.utils").get_palette()
+	local mode_bgs = {
+		normal = BLUE_END,
+		insert = colors.surface0,
+	}
+
+	for mode, bg in pairs(mode_bgs) do
+		theme[mode] = theme[mode] or vim.deepcopy(theme.normal or {})
+		theme[mode].a = vim.tbl_extend("force", vim.deepcopy(theme[mode].a or {}), { bg = bg, gui = "bold" })
+		theme[mode].z = vim.tbl_extend("force", vim.deepcopy(theme[mode].a), { bg = bg, gui = "bold" })
 	end
-	if type(theme.inactive) == "table" and type(theme.inactive.a) == "table" then
-		theme.inactive.a.bg = BLUE_END
-	end
+
 	return theme
 end
 
 return {
 	options = {
-		theme = theme_with_blue_ends(),
+		theme = custom_theme(),
+		section_separators = { left = "", right = "" },
 	},
 	sections = {
 		lualine_b = function(defaults)
