@@ -1,5 +1,30 @@
 local icons = require("modules.utils.icons")
 
+local function cwd_section_color()
+	local theme = require("lualine.utils.loader").load_theme(vim.g.colors_name) or require("lualine.themes.auto")
+	local normal = theme.normal or {}
+	local cwd_section = normal.y or normal.b or {}
+
+	return {
+		fg = cwd_section.fg,
+		bg = cwd_section.bg,
+		gui = "bold",
+	}
+end
+
+local function file_progress()
+	local cursorline = vim.fn.line(".")
+	local filelines = vim.fn.line("$")
+
+	if cursorline == 1 then
+		return "Top"
+	elseif cursorline == filelines then
+		return "Bot"
+	end
+
+	return string.format("%2d%%%%", math.floor(cursorline / filelines * 100))
+end
+
 local custom = {
 	sep = {
 		function()
@@ -32,22 +57,19 @@ local custom = {
 			local virtual_col = vim.fn.virtcol(".")
 			local real_col = vim.fn.col(".")
 			local filelines = vim.fn.line("$")
-			local position
-
-			if cursorline == 1 then
-				position = "Top"
-			elseif cursorline == filelines then
-				position = "Bot"
-			else
-				position = string.format("%2d%%%%", math.floor(cursorline / filelines * 100))
-			end
 
 			if real_col == virtual_col then
-				return string.format("%3d/%d,%2d %s", cursorline, filelines, real_col, position)
+				return string.format("%3d/%d,%2d", cursorline, filelines, real_col)
 			else
-				return string.format("%3d/%d,%2d-%-2d %s", cursorline, filelines, real_col, virtual_col, position)
+				return string.format("%3d/%d,%2d-%-2d", cursorline, filelines, real_col, virtual_col)
 			end
 		end,
+	},
+
+	file_progress = {
+		file_progress,
+		color = cwd_section_color,
+		padding = { left = 1, right = 1 },
 	},
 
 	watch_icon = {
@@ -71,15 +93,15 @@ local function custom_theme()
 
 	local theme = require("lualine.utils.loader").load_theme(vim.g.colors_name) or require("lualine.themes.auto")
 	local colors = require("modules.utils").get_palette()
+	local default_normal_bg = theme.normal and theme.normal.a and theme.normal.a.bg or colors.green
 	local mode_bgs = {
 		normal = BLUE_END,
-		insert = colors.surface0,
+		insert = default_normal_bg,
 	}
 
 	for mode, bg in pairs(mode_bgs) do
 		theme[mode] = theme[mode] or vim.deepcopy(theme.normal or {})
 		theme[mode].a = vim.tbl_extend("force", vim.deepcopy(theme[mode].a or {}), { bg = bg, gui = "bold" })
-		theme[mode].z = vim.tbl_extend("force", vim.deepcopy(theme[mode].a), { bg = bg, gui = "bold" })
 	end
 
 	return theme
@@ -124,12 +146,7 @@ return {
 		lualine_z = function()
 			return {
 				custom.file_location,
-				custom.watch_icon,
-				{
-					'datetime',
-					style = '%H:%M',
-					padding = { right = 1 },
-				},
+				custom.file_progress,
 			}
 		end,
 	},
