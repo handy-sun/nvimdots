@@ -179,4 +179,27 @@ return function()
 			},
 		},
 	})
+
+	for _, cmdtype in ipairs({ "/", "?" }) do
+		cmp.setup.cmdline(cmdtype, {
+			mapping = cmp.mapping.preset.cmdline(),
+			sources = {
+				{ name = "buffer" },
+			},
+		})
+	end
+
+	cmp.setup.cmdline(":", {
+		mapping = cmp.mapping.preset.cmdline(),
+		sources = cmp.config.sources({
+			{ name = "path" },
+		}, {
+			{
+				name = "cmdline",
+				option = {
+					ignore_cmds = { "Man", "!" },
+				},
+			},
+		}),
+	})
 end
