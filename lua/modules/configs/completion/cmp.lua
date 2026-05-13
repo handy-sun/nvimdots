@@ -48,7 +48,28 @@ return function()
 	})
 
 	local cmp = require("cmp")
+	local disabled_bang_cmds = {
+		edit = true,
+	}
+
+	local is_disabled_bang_cmdline = function()
+		if vim.fn.getcmdtype() ~= ":" then
+			return false
+		end
+
+		local ok, parsed = pcall(vim.api.nvim_parse_cmd, vim.fn.getcmdline(), {})
+		return ok and parsed.bang and disabled_bang_cmds[parsed.cmd] == true
+	end
+
 	require("modules.utils").load_plugin("cmp", {
+		enabled = function()
+			local disabled = false
+			disabled = disabled or (vim.api.nvim_get_option_value("buftype", { buf = 0 }) == "prompt")
+			disabled = disabled or (vim.fn.reg_recording() ~= "")
+			disabled = disabled or (vim.fn.reg_executing() ~= "")
+			disabled = disabled or is_disabled_bang_cmdline()
+			return not disabled
+		end,
 		preselect = cmp.PreselectMode.None,
 		window = {
 			completion = {
@@ -178,6 +199,16 @@ return function()
 				hl_group = "Whitespace",
 			},
 		},
+	})
+
+	vim.api.nvim_create_autocmd("CmdlineChanged", {
+		group = vim.api.nvim_create_augroup("_cmp_close_disabled_bang", { clear = true }),
+		pattern = ":",
+		callback = function()
+			if is_disabled_bang_cmdline() then
+				cmp.close()
+			end
+		end,
 	})
 
 	for _, cmdtype in ipairs({ "/", "?" }) do
