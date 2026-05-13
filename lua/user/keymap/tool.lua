@@ -29,6 +29,8 @@ return {
 	["n|z'"] = map_cr("registers"):with_noremap():with_desc("command: Show all registers"),
 	["n|zm"] = map_cr("marks"):with_noremap():with_desc("command: Show all marks"),
 	["n|zl"] = map_cmd(":ls<CR>"):with_noremap():with_desc("command: Show all buffers and select one"),
+	["n|<leader>m"] = map_cr("Noice history"):with_noremap():with_desc("message: Show history"),
+	["n|<leader>M"] = map_cr("Noice errors"):with_noremap():with_desc("message: Show errors"),
 	["n|sd"] = map_cr("bdelete"):with_noremap():with_desc("command: Delete current buffer"),
 	-- Quickfix
 	["n|z["] = map_cr("exe v:count1 . 'cprevious'"):with_noremap():with_silent():with_desc("quickfix: move [count] prev"),
