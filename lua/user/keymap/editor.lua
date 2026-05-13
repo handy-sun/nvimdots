@@ -8,7 +8,7 @@ return {
 	["v|J"] = "",
 	["v|K"] = "",
 	-- Select all
-	["n|<C-a>"] = map_cmd("ggVG"):with_noremap():with_desc("Select all contents"),
+	["n|<leader>va"] = map_cmd("ggVG"):with_noremap():with_desc("Select all contents"),
 	-- Suckless overrides
 	["n|n"] = map_cmd("'Nn'[v:searchforward]"):with_noremap():with_expr():with_desc("Always search forward"),
 	["n|N"] = map_cmd("'nN'[v:searchforward]"):with_noremap():with_expr():with_desc("Always search backward"),
@@ -43,6 +43,8 @@ return {
 	["n|<Leader>\""] = map_cmd('viw<ESC>bi"<ESC>ea"<ESC>'):with_noremap():with_desc("edit: Wrap the word with double quote"),
 	["n|<Leader>;"] = map_cmd("mzA;<ESC>`z"):with_noremap():with_desc("edit: Append a ';' after EOL"),
 	-- Insert mode overrides
+	["i|<Find>"] = map_cmd("<Home>"):with_noremap():with_silent():with_desc("Move cursor to line start"),
+	["i|<Select>"] = map_cmd("<End>"):with_noremap():with_silent():with_desc("Move cursor to line end"),
 	["i|<C-d>"] = map_cmd("<Esc>ddi"):with_noremap():with_silent():with_desc("Clear current line"),
 	["i|<C-z>"] = map_cmd("<Esc>ui"):with_noremap():with_silent():with_desc("Undo"),
 	["i|<C-k>"] = map_cmd("<C-o>D"):with_noremap():with_silent():with_desc("Delete content behind block"),
