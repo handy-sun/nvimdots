@@ -24,7 +24,9 @@ $env:CCLONE_ATTR ??= 'undef'
 $env:CCLONE_BRANCH ??= 'main'
 $env:CCLONE_BRANCH_LEGACY ??= '0.10'
 $env:CCDEST_DIR ??= "$env:XDG_CONFIG_HOME\nvim"
-$env:CCBACKUP_DIR = "$env:CCDEST_DIR" + "_backup-" + (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmss")
+$CCINSTALL_TIMESTAMP = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmss")
+$env:CCBACKUP_DIR = "$env:CCDEST_DIR" + "_backup-" + $CCINSTALL_TIMESTAMP
+$env:CCTEMP_DIR = "$env:CCDEST_DIR" + "_installing-" + $CCINSTALL_TIMESTAMP
 
 function _abort ([Parameter(Mandatory = $True)] [string]$Msg,[Parameter(Mandatory = $True)] [string]$Type,[Parameter(Mandatory = $False)] [string]$ExtMsg) {
 	if ($ExtMsg -ne $null) {
@@ -131,6 +133,53 @@ function check_in_path ([Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()]
 		return $True
 	} else {
 		return $False
+	}
+}
+
+function assert_safe_install_paths {
+	if ([string]::IsNullOrWhiteSpace($env:CCDEST_DIR)) {
+		_abort -Msg 'The destination directory is empty.' -Type "InvalidArgument"
+	}
+
+	$dest_full = [System.IO.Path]::GetFullPath($env:CCDEST_DIR)
+	$dest_parent = Split-Path -Path $dest_full -Parent
+	$root = [System.IO.Path]::GetPathRoot($dest_full)
+	$trim_chars = [char[]]@('\', '/')
+	if ($dest_full.TrimEnd($trim_chars) -eq $root.TrimEnd($trim_chars)) {
+		_abort -Msg "Refusing to install into a filesystem root: $dest_full" -Type "InvalidArgument"
+	}
+
+	if (-not (Test-Path -LiteralPath $dest_parent -PathType Container)) {
+		_abort -Msg "The parent directory does not exist: $dest_parent" -Type "ObjectNotFound"
+	}
+
+	$env:CCDEST_DIR = $dest_full
+	$env:CCBACKUP_DIR = "$env:CCDEST_DIR" + "_backup-" + $CCINSTALL_TIMESTAMP
+	$env:CCTEMP_DIR = "$env:CCDEST_DIR" + "_installing-" + $CCINSTALL_TIMESTAMP
+
+	if ((Test-Path -LiteralPath $env:CCTEMP_DIR) -or (Test-Path -LiteralPath $env:CCBACKUP_DIR)) {
+		_abort -Msg "The temporary or backup directory already exists. Please remove stale installer directories first." -Type "ResourceExists" -ExtMsg @"
+Temporary directory:
+  $env:CCTEMP_DIR
+Backup directory:
+  $env:CCBACKUP_DIR
+
+"@
+	}
+
+	if ((Test-Path -LiteralPath $env:CCDEST_DIR)) {
+		if (-not (Test-Path -LiteralPath $env:CCDEST_DIR -PathType Container)) {
+			_abort -Msg "The destination exists but is not a directory: $env:CCDEST_DIR" -Type "InvalidArgument"
+		}
+
+		$dest_item = Get-Item -LiteralPath $env:CCDEST_DIR -Force
+		if (($dest_item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+			_abort -Msg "Refusing to replace a symlink or junction: $env:CCDEST_DIR" -Type "InvalidOperation" -ExtMsg @'
+The destination is a reparse point. This often means your Neovim config is managed by
+a dotfiles system. Move or update it manually so the installer does not break that link.
+
+'@
+		}
 	}
 }
 
@@ -283,13 +332,13 @@ function check_nvim_version ([Parameter(Mandatory = $True)][ValidateNotNullOrEmp
 	return ($nvim_version -ge $RequiredVersionMin)
 }
 
-function clone_repo ([Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()] [string]$WithURL) {
+function clone_repo ([Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()] [string]$WithURL,[Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()] [string]$Destination) {
 	if ((check_nvim_version -RequiredVersionMin $REQUIRED_NVIM_VERSION)) {
-		safe_execute -WithCmd { git clone --progress -b "$env:CCLONE_BRANCH" "$env:CCLONE_ATTR" $WithURL "$env:CCDEST_DIR" }
+		safe_execute -WithCmd { git clone --progress -b "$env:CCLONE_BRANCH" "$env:CCLONE_ATTR" $WithURL "$Destination" }
 	} elseif ((check_nvim_version -RequiredVersionMin $REQUIRED_NVIM_VERSION_LEGACY)) {
 		warn -Msg "You have outdated Nvim installed (< $REQUIRED_NVIM_VERSION)."
 		info -Msg "Automatically redirecting you to the latest compatible version..."
-		safe_execute -WithCmd { git clone --progress -b "$env:CCLONE_BRANCH_LEGACY" "$env:CCLONE_ATTR" $WithURL "$env:CCDEST_DIR" }
+		safe_execute -WithCmd { git clone --progress -b "$env:CCLONE_BRANCH_LEGACY" "$env:CCLONE_ATTR" $WithURL "$Destination" }
 	} else {
 		warn -Msg "You have outdated Nvim installed (< $REQUIRED_NVIM_VERSION_LEGACY)."
 		_abort -Msg "This Neovim distribution is no longer supported." -Type "NotImplemented" -ExtMsg @"
@@ -304,6 +353,37 @@ function ring_bell {
 	[System.Console]::beep()
 }
 
+function finalize_install_dir {
+	$moved_existing = $False
+	try {
+		if ((Test-Path -LiteralPath $env:CCDEST_DIR)) {
+			Move-Item -LiteralPath "$env:CCDEST_DIR" -Destination "$env:CCBACKUP_DIR" -Force -ErrorAction Stop
+			$moved_existing = $True
+		}
+
+		Move-Item -LiteralPath "$env:CCTEMP_DIR" -Destination "$env:CCDEST_DIR" -Force -ErrorAction Stop
+	}
+	catch {
+		$finalize_error = $_
+		if ($moved_existing -and (-not (Test-Path -LiteralPath $env:CCDEST_DIR)) -and (Test-Path -LiteralPath $env:CCBACKUP_DIR)) {
+			try {
+				Move-Item -LiteralPath "$env:CCBACKUP_DIR" -Destination "$env:CCDEST_DIR" -Force -ErrorAction Stop
+				warn -Msg "Installation failed, and the previous config was restored."
+			}
+			catch {
+				warn -Msg "Installation failed, and automatic rollback also failed."
+				warn_ext -Msg "Your previous config is still at: $env:CCBACKUP_DIR"
+			}
+		}
+
+		if ((Test-Path -LiteralPath $env:CCTEMP_DIR)) {
+			warn -Msg "The prepared temporary install is still at: $env:CCTEMP_DIR"
+		}
+
+		_abort -Msg "Failed to finalize install: $finalize_error" -Type "InvalidResult"
+	}
+}
+
 function _main {
 	if (-not $IsWindows) {
 		_abort -Msg "This install script can only execute on Windows." -Type "DeviceError"
@@ -313,6 +393,7 @@ function _main {
 		_abort -Msg "This script cannot proceed in non-interactive mode." -Type "NotImplemented"
 	}
 
+	assert_safe_install_paths
 	info -Msg "Checking dependencies..."
 
 	init_pack
@@ -349,10 +430,10 @@ You must install Git before installing this Nvim config. See:
 '@
 	}
 
-	info -Msg "This script will install ayamir/nvimdots to:"
+	info -Msg "This script will install handy-sun/nvimdots to:"
 	Write-Host $env:CCDEST_DIR
 
-	if ((Test-Path $env:CCDEST_DIR)) {
+	if ((Test-Path -LiteralPath $env:CCDEST_DIR)) {
 		warn -Msg "The destination folder: `"$env:CCDEST_DIR`" already exists."
 		warn_ext -Msg "We will make a backup for you at `"$env:CCBACKUP_DIR`"."
 	}
@@ -364,29 +445,27 @@ You must install Git before installing this Nvim config. See:
 	}
 	check_clone_pref
 
-	if ((Test-Path $env:CCDEST_DIR)) {
-		safe_execute -WithCmd { Move-Item -Path "$env:CCDEST_DIR" -Destination "$env:CCBACKUP_DIR" -Force }
-	}
-
 	info -Msg "Fetching in progress..."
 
 	if ($USE_SSH) {
-		clone_repo -WithURL 'git@github.com:ayamir/nvimdots.git'
+		clone_repo -WithURL 'git@github.com:handy-sun/nvimdots.git' -Destination "$env:CCTEMP_DIR"
 	} else {
-		clone_repo -WithURL 'https://github.com/ayamir/nvimdots.git'
+		clone_repo -WithURL 'https://github.com/handy-sun/nvimdots.git' -Destination "$env:CCTEMP_DIR"
 	}
 
-	safe_execute -WithCmd { Set-Location -Path "$env:CCDEST_DIR" }
-	safe_execute -WithCmd { Copy-Item -Path "$env:CCDEST_DIR\lua\user_template\" -Destination "$env:CCDEST_DIR\lua\user" -Recurse -Force }
+	safe_execute -WithCmd { Copy-Item -Path "$env:CCTEMP_DIR\lua\user_template\" -Destination "$env:CCTEMP_DIR\lua\user" -Recurse -Force }
 
 	if (-not $USE_SSH) {
 		info -Msg "Changing default fetching method to HTTPS..."
 		safe_execute -WithCmd {
-			(Get-Content "$env:CCDEST_DIR\lua\user\settings.lua") |
+			(Get-Content "$env:CCTEMP_DIR\lua\user\settings.lua") |
 			ForEach-Object { $_ -replace '\["use_ssh"\] = true','["use_ssh"] = false' } |
-			Set-Content "$env:CCDEST_DIR\lua\user\settings.lua"
+			Set-Content "$env:CCTEMP_DIR\lua\user\settings.lua"
 		}
 	}
+
+	finalize_install_dir
+	safe_execute -WithCmd { Set-Location -Path "$env:CCDEST_DIR" }
 
 	info -Msg "Spawning Neovim and fetching plugins... (You'll be redirected shortly)"
 	info -Msg 'Please make sure you have a Rust Toolchain installed via `rustup`! Otherwise, unexpected things may'
@@ -397,10 +476,10 @@ You must install Git before installing this Nvim config. See:
 
 Thank you for using this set of configuration!
 - Project Homepage:
-    https://github.com/ayamir/nvimdots
+    https://github.com/handy-sun/nvimdots
     ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 - Further documentation (including executables you |must| install for full functionality):
-    https://github.com/ayamir/nvimdots/wiki/Prerequisites
+    https://github.com/handy-sun/nvimdots/wiki/Prerequisites
     ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 '@
 
