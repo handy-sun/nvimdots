@@ -18,12 +18,10 @@ settings["colorscheme"] = "onedark"
 
 -- plug: mason-lspconfig: ensure_installed used
 -- @type string[]
-settings["lsp_deps"] = function(defaults)
+settings["lsp_deps"] = function()
 	return {
-		"clangd",
 		"bashls",
 		"jsonls",
-		"lua_ls",
 	}
 end
 
@@ -57,11 +55,10 @@ end
 -- General-purpose sources for none-ls to install during bootstrap.
 -- Supported sources: https://github.com/nvimtools/none-ls.nvim/tree/main/lua/null-ls/builtins
 ---@type string[]
-settings["null_ls_deps"] = function(defaults)
+settings["null_ls_deps"] = function()
 	return {
 		"clang_format",
 		"shfmt",
-		"stylua",
 		"vint",
 	}
 end
