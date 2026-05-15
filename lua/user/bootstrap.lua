@@ -5,74 +5,58 @@
 ---   nvim --headless -c "lua require('user.bootstrap')()"
 ---
 --- This will:
----   1. Clone lazy.nvim if not present
----   2. Load plugin specs (upstream + user overrides)
----   3. Install all missing plugins via lazy.nvim sync
----   4. Quit Neovim automatically when done
-local fn, api = vim.fn, vim.api
-local global = require("core.global")
-local settings = require("core.settings")
+---   1. Sync all lazy.nvim plugins (install missing, update, clean)
+---   2. Quit Neovim automatically when done
+---
+--- NOTE: This module runs via `-c` AFTER init.lua has already set up lazy.nvim.
+--- Do NOT call `require("lazy").setup()" again — it triggers
+--- "Re-sourcing your config is not supported" and prevents sync from working.
 
-local data_dir = global.data_dir
-local lazy_path = data_dir .. "lazy/lazy.nvim"
-local vim_path = global.vim_path
-local modules_dir = vim_path .. "/lua/modules"
-local user_config_dir = vim_path .. "/lua/user"
+local DEFAULT_TIMEOUT = 900 -- minimum fallback (seconds)
+local LATENCY_MULTIPLIER = 10 -- each plugin ~= N × single-request latency
 
---- Aggregate plugin specs from both upstream and user plugin directories.
----@return table[] lazy.nvim spec list
-local function load_plugins()
-	local plugins = {}
-
-	-- Extend package.path so `require` can resolve config modules
-	package.path = package.path
-		.. string.format(
-			";%s;%s;%s",
-			modules_dir .. "/configs/?.lua",
-			modules_dir .. "/configs/?/init.lua",
-			user_config_dir .. "/?.lua"
-		)
-
-	-- Collect plugin declaration files from both directories
-	local upstream = vim.split(fn.glob(modules_dir .. "/plugins/*.lua"), "\n")
-	local user = vim.split(fn.glob(user_config_dir .. "/plugins/*.lua"), "\n", { trimempty = true })
-	vim.list_extend(upstream, user)
-
-	for _, f in ipairs(upstream) do
-		-- Derive the require-able module name from the file path
-		local mod = f:find(modules_dir) and f:sub(#modules_dir - 6, -1) or f:sub(#user_config_dir - 3, -1)
-		local ok, mods = pcall(require, mod:sub(0, #mod - 4))
-		if ok and type(mods) == "table" then
-			for name, conf in pairs(mods) do
-				plugins[#plugins + 1] = vim.tbl_extend("force", { name }, conf)
-			end
-		end
+--- Estimate a reasonable timeout based on network latency and plugin count.
+--- Measures GitHub responsiveness via `git ls-remote`, then scales by
+--- plugin count. Falls back to DEFAULT_TIMEOUT if the probe fails.
+local function estimate_timeout()
+	local ok, lazy = pcall(require, "lazy")
+	if not ok then
+		print(("[bootstrap] lazy.nvim not available, using default timeout %ds"):format(DEFAULT_TIMEOUT))
+		return DEFAULT_TIMEOUT
 	end
 
-	-- Append disabled plugin entries
-	for _, name in ipairs(settings.disabled_plugins) do
-		plugins[#plugins + 1] = { name, enabled = false }
+	local plugin_count = #lazy.plugins()
+
+	-- Probe GitHub with a lightweight `git ls-remote` to gauge network speed
+	local start = vim.uv.hrtime()
+	local result = vim.system(
+		{ "git", "ls-remote", "--heads", "https://github.com/folke/lazy.nvim" },
+		{ timeout = 15000 }
+	):wait()
+	local latency = (vim.uv.hrtime() - start) / 1e9
+
+	if result.code ~= 0 then
+		print(("[bootstrap] network probe failed, using default timeout %ds"):format(DEFAULT_TIMEOUT))
+		return DEFAULT_TIMEOUT
 	end
 
-	return plugins
+	-- A git clone involves multiple round-trips + potential build steps,
+	-- so each plugin is estimated at LATENCY_MULTIPLIER × single-request latency.
+	local estimated = math.ceil(plugin_count * latency * LATENCY_MULTIPLIER)
+	local timeout = math.max(DEFAULT_TIMEOUT, estimated)
+
+	print(("[bootstrap] latency=%.1fs  plugins=%d  estimated=%ds  timeout=%ds"):format(
+		latency,
+		plugin_count,
+		estimated,
+		timeout
+	))
+
+	return timeout
 end
 
---- Main bootstrap entry point.
 local function bootstrap()
-	-- Clone lazy.nvim if not present
-	if not vim.uv.fs_stat(lazy_path) then
-		local lazy_repo = settings.use_ssh and "git@github.com:folke/lazy.nvim.git "
-			or "https://github.com/folke/lazy.nvim.git "
-		api.nvim_command("!git clone --filter=blob:none --branch=stable " .. lazy_repo .. lazy_path)
-	end
-
-	local plugins = load_plugins()
-
-	-- Determine git URL format
-	local clone_prefix = settings.use_ssh and "git@github.com:%s.git" or "https://github.com/%s.git"
-
-	-- Register LazySync callback to quit after installation completes
-	api.nvim_create_autocmd("User", {
+	vim.api.nvim_create_autocmd("User", {
 		pattern = "LazySync",
 		once = true,
 		callback = function()
@@ -80,40 +64,18 @@ local function bootstrap()
 		end,
 	})
 
-	vim.opt.rtp:prepend(lazy_path)
-	require("lazy").setup(plugins, {
-		root = data_dir .. "lazy",
-		git = {
-			timeout = 300,
-			url_format = clone_prefix,
-		},
-		install = {
-			missing = true,
-			colorscheme = { settings.colorscheme },
-		},
-		-- Minimal UI — we're running headless anyway
-		ui = { border = "rounded" },
-		performance = {
-			reset_packpath = true,
-			rtp = {
-				reset = true,
-				paths = {},
-				disabled_plugins = {
-					"editorconfig",
-					"spellfile",
-					"matchit",
-					"matchparen",
-					"tohtml",
-					"gzip",
-					"tarPlugin",
-					"zipPlugin",
-				},
-			},
-		},
-	})
+	-- "LazySync" is NOT an editor command — lazy.nvim uses `:Lazy sync`
+	-- (sub-command syntax). Call the Lua API instead.
+	require("lazy").sync()
 
-	-- Trigger sync (install + update + clean)
-	vim.cmd("LazySync")
+	-- Dynamic timeout failsafe: force quit if callbacks never fire
+	local timeout = estimate_timeout()
+	local timer = vim.uv.new_timer()
+	timer:start(timeout * 1000, 0, function()
+		timer:stop()
+		timer:close()
+		vim.cmd("qall!")
+	end)
 end
 
 return bootstrap
