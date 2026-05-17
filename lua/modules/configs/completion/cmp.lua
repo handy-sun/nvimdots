@@ -213,6 +213,7 @@ return function()
 
 	for _, cmdtype in ipairs({ "/", "?" }) do
 		cmp.setup.cmdline(cmdtype, {
+			completion = { autocomplete = false },
 			mapping = cmp.mapping.preset.cmdline(),
 			sources = {
 				{ name = "buffer" },
