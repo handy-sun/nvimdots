@@ -124,6 +124,25 @@ ui['folke/noice.nvim'] = {
 			},
 			routes = {
 				{
+					filter = {
+						event = "lsp",
+						kind = "progress",
+						cond = function(message)
+							local progress = message.opts and message.opts.progress
+							return progress and progress.title == "Fetching flake with inputs"
+						end,
+					},
+					opts = { skip = true },
+				},
+				{
+					filter = {
+						event = "lsp",
+						kind = "message",
+						find = "Fetching flake with inputs",
+					},
+					opts = { skip = true },
+				},
+				{
 					view = "mini",
 					filter = {
 						any = {
