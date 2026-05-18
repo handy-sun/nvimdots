@@ -40,7 +40,10 @@ return {
 	["n|sa"] = map_cmd(":%s/<C-R>a/"):with_noremap():with_desc("replace register a"),
 	["n|s/"] = map_cmd(":%s/<C-R>//"):with_noremap():with_desc("replace search word"),
 	["n|sr"] = map_cmd(":%s/\\<<C-R><C-W>\\>/"):with_noremap():with_desc("replace the word under the cursor"),
+	["n|<Leader>'"] = map_cmd("viw<ESC>bi'<ESC>ea'<ESC>"):with_noremap():with_desc("edit: Wrap the word with single quote"),
 	["n|<Leader>\""] = map_cmd('viw<ESC>bi"<ESC>ea"<ESC>'):with_noremap():with_desc("edit: Wrap the word with double quote"),
+	["v|<Leader>'"] = map_cmd("<ESC>`>a'<ESC>`<i'<ESC>"):with_noremap():with_desc("edit: Wrap the selection with single quote"),
+	["v|<Leader>\""] = map_cmd('<ESC>`>a"<ESC>`<i"<ESC>'):with_noremap():with_desc("edit: Wrap the selection with double quote"),
 	["n|<Leader>;"] = map_cmd("mzA;<ESC>`z"):with_noremap():with_desc("edit: Append a ';' after EOL"),
 	-- Insert mode overrides
 	["i|<Find>"] = map_cmd("<Home>"):with_noremap():with_silent():with_desc("Move cursor to line start"),
