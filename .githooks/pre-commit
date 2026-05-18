@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+## pre-commit — format staged Lua files with stylua
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "${repo_root}"
+
+if ! command -v stylua >/dev/null 2>&1; then
+	echo "Error: stylua is not installed or not in PATH"
+	exit 1
+fi
+
+mapfile -d '' files < <(git diff --cached --name-only --diff-filter=ACMR -z -- "*.lua")
+
+if [[ "${#files[@]}" -eq 0 ]]; then
+	exit 0
+fi
+
+dirty_files=()
+for file in "${files[@]}"; do
+	if ! git diff --quiet -- "${file}"; then
+		dirty_files+=("${file}")
+	fi
+done
+
+if [[ "${#dirty_files[@]}" -gt 0 ]]; then
+	echo "Error: staged Lua files have unstaged changes:"
+	printf '  %s\n' "${dirty_files[@]}"
+	echo "Please stage or stash those edits before commit so stylua can run safely."
+	exit 1
+fi
+
+echo ">>> Formatting staged Lua files with stylua..."
+stylua --respect-ignores "${files[@]}"
+git add -- "${files[@]}"
+stylua --check --verify --respect-ignores "${files[@]}" >/dev/null
+echo ">>> Stylua formatting complete"
