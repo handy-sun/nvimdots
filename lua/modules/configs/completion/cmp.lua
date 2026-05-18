@@ -52,6 +52,24 @@ return function()
 		edit = true,
 	}
 
+	local count_unescaped = function(text, target)
+		local count = 0
+		local escaped = false
+
+		for i = 1, #text do
+			local char = text:sub(i, i)
+			if escaped then
+				escaped = false
+			elseif char == "\\" then
+				escaped = true
+			elseif char == target then
+				count = count + 1
+			end
+		end
+
+		return count
+	end
+
 	local is_disabled_bang_cmdline = function()
 		if vim.fn.getcmdtype() ~= ":" then
 			return false
@@ -61,13 +79,37 @@ return function()
 		return ok and parsed.bang and disabled_bang_cmds[parsed.cmd] == true
 	end
 
+	local is_substitute_replace_cmdline = function()
+		if vim.fn.getcmdtype() ~= ":" then
+			return false
+		end
+
+		local cmdline = vim.fn.getcmdline():sub(1, vim.fn.getcmdpos() - 1)
+		local ok, parsed = pcall(vim.api.nvim_parse_cmd, cmdline, {})
+		if not ok or parsed.cmd ~= "substitute" then
+			return false
+		end
+
+		-- `:s` only needs completion before the second delimiter. Afterwards we are editing the replacement text.
+		local _, delimiter_pos, _, delimiter = cmdline:find("([%a]+)([^%w%s])")
+		if not delimiter_pos or delimiter == "\\" then
+			return false
+		end
+
+		return count_unescaped(cmdline:sub(delimiter_pos), delimiter) == 2
+	end
+
+	local is_disabled_cmdline_completion = function()
+		return is_disabled_bang_cmdline() or is_substitute_replace_cmdline()
+	end
+
 	require("modules.utils").load_plugin("cmp", {
 		enabled = function()
 			local disabled = false
 			disabled = disabled or (vim.api.nvim_get_option_value("buftype", { buf = 0 }) == "prompt")
 			disabled = disabled or (vim.fn.reg_recording() ~= "")
 			disabled = disabled or (vim.fn.reg_executing() ~= "")
-			disabled = disabled or is_disabled_bang_cmdline()
+			disabled = disabled or is_disabled_cmdline_completion()
 			return not disabled
 		end,
 		preselect = cmp.PreselectMode.None,
@@ -202,10 +244,10 @@ return function()
 	})
 
 	vim.api.nvim_create_autocmd("CmdlineChanged", {
-		group = vim.api.nvim_create_augroup("_cmp_close_disabled_bang", { clear = true }),
+		group = vim.api.nvim_create_augroup("_cmp_close_disabled_cmdline", { clear = true }),
 		pattern = ":",
 		callback = function()
-			if is_disabled_bang_cmdline() then
+			if is_disabled_cmdline_completion() then
 				cmp.close()
 			end
 		end,
@@ -222,6 +264,9 @@ return function()
 	end
 
 	cmp.setup.cmdline(":", {
+		enabled = function()
+			return not is_disabled_cmdline_completion()
+		end,
 		mapping = cmp.mapping.preset.cmdline(),
 		sources = cmp.config.sources({
 			{ name = "path" },
