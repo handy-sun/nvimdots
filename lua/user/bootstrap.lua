@@ -32,7 +32,8 @@ local function estimate_timeout()
 	local result = vim.system(
 		{ "git", "ls-remote", "--heads", "https://github.com/folke/lazy.nvim" },
 		{ timeout = 15000 }
-	):wait()
+	)
+		:wait()
 	local latency = (vim.uv.hrtime() - start) / 1e9
 
 	if result.code ~= 0 then
@@ -45,12 +46,14 @@ local function estimate_timeout()
 	local estimated = math.ceil(plugin_count * latency * LATENCY_MULTIPLIER)
 	local timeout = math.max(DEFAULT_TIMEOUT, estimated)
 
-	print(("[bootstrap] latency=%.1fs  plugins=%d  estimated=%ds  timeout=%ds"):format(
-		latency,
-		plugin_count,
-		estimated,
-		timeout
-	))
+	print(
+		("[bootstrap] latency=%.1fs  plugins=%d  estimated=%ds  timeout=%ds"):format(
+			latency,
+			plugin_count,
+			estimated,
+			timeout
+		)
+	)
 
 	return timeout
 end

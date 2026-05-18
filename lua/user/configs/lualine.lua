@@ -30,7 +30,7 @@ local custom = {
 		function()
 			return "|"
 		end,
-		padding = { left = 1 }
+		padding = { left = 1 },
 	},
 
 	shift_width = {
@@ -73,10 +73,10 @@ local custom = {
 	},
 
 	watch_icon = {
-		function ()
-			return icons.get('misc', true).Watch
+		function()
+			return icons.get("misc", true).Watch
 		end,
-		padding = { left = 1 }
+		padding = { left = 1 },
 	},
 }
 
@@ -116,7 +116,7 @@ return {
 		lualine_b = function(defaults)
 			return {
 				{
-					'filename',
+					"filename",
 					file_status = false,
 					-- Display new file status (new file means no write after created)
 					newfile_status = false,

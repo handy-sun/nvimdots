@@ -1,50 +1,49 @@
-
 local vfn = vim.fn
 local ui = {}
 
-ui['preservim/tagbar'] = {
+ui["preservim/tagbar"] = {
 	lazy = true,
-	event = { 'BufReadPost' },
-	name = 'tagbar',
+	event = { "BufReadPost" },
+	name = "tagbar",
 	init = function()
 		local expect_width = vfn.float2nr(vfn.winwidth(0) / 6) + 2
 		vim.g.tagbar_width = vfn.max({ 32, expect_width })
 		vim.g.tagbar_compact = 2
 		vim.g.tagbar_indent = 1
-		vim.g.tagbar_iconchars = { '', '▼' }
+		vim.g.tagbar_iconchars = { "", "▼" }
 		vim.g.tagbar_sort = 0
-		vim.g.tagbar_position = 'topleft vertical'
-	end
+		vim.g.tagbar_position = "topleft vertical"
+	end,
 }
 
-ui['navarasu/onedark.nvim'] = {
+ui["navarasu/onedark.nvim"] = {
 	lazy = true,
-	name = 'navarasu-onedark',
+	name = "navarasu-onedark",
 	config = function()
-		require('onedark').setup {
-			style = 'darker',
-			toggle_style_key = '<leader>ts',
+		require("onedark").setup({
+			style = "darker",
+			toggle_style_key = "<leader>ts",
 			code_style = {
 				-- comments = 'italic'
 			},
 			diagnostics = {
 				darker = true, -- darker colors for diagnostic
-				undercurl = true,-- use undercurl instead of underline for diagnostics
+				undercurl = true, -- use undercurl instead of underline for diagnostics
 				background = true,
 			},
 			colors = {
-				dg_comment = '#52823f'
+				dg_comment = "#52823f",
 			},
 			highlights = {
-				["@comment"] = {fg = '$dg_comment', fmt = 'italic'},
-			}
-		}
-	end
+				["@comment"] = { fg = "$dg_comment", fmt = "italic" },
+			},
+		})
+	end,
 }
 
-ui['mikavilpas/yazi.nvim'] = {
+ui["mikavilpas/yazi.nvim"] = {
 	lazy = false,
-	name = 'yazi.nvim',
+	name = "yazi.nvim",
 	version = "*", -- use the latest stable version
 	event = "VeryLazy",
 	dependencies = {
@@ -84,7 +83,7 @@ ui['mikavilpas/yazi.nvim'] = {
 	end,
 }
 
-ui['folke/noice.nvim'] = {
+ui["folke/noice.nvim"] = {
 	event = "VeryLazy",
 	dependencies = {
 		"MunifTanjim/nui.nvim",

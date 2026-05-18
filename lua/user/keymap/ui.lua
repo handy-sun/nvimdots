@@ -10,8 +10,14 @@ return {
 	-- Plugin: bufferline.nvim
 	["n|<C-i>"] = map_cr("BufferLineCyclePrev"):with_noremap():with_silent():with_desc("buffer: Switch to prev"),
 	["n|<C-o>"] = map_cr("BufferLineCycleNext"):with_noremap():with_silent():with_desc("buffer: Switch to next"),
-	["n|<leader><Left>"] = map_cu("exe v:count1 . 'bprevious'"):with_noremap():with_silent():with_desc("buffer: Switch to [count] prev"),
-	["n|<leader><Right>"] = map_cu("exe v:count1 . 'bnext'"):with_noremap():with_silent():with_desc("buffer: Switch to [count] next"),
+	["n|<leader><Left>"] = map_cu("exe v:count1 . 'bprevious'")
+		:with_noremap()
+		:with_silent()
+		:with_desc("buffer: Switch to [count] prev"),
+	["n|<leader><Right>"] = map_cu("exe v:count1 . 'bnext'")
+		:with_noremap()
+		:with_silent()
+		:with_desc("buffer: Switch to [count] next"),
 	-- Save and quit
 	["n|<leader>w"] = map_cr("w"):with_noremap():with_silent():with_desc("edit: Save file"),
 	["n|<leader>q"] = map_cr("q"):with_desc("edit: Quit"),

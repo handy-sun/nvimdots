@@ -19,7 +19,9 @@ return {
 	["v|<leader>/"] = map_cmd("gc"):with_silent():with_desc("edit: Toggle comment for line in Visual(custom)"),
 	-- Paste/format shortcuts
 	["n|<leader>W"] = map_cmd(":%s/\\s\\+$//<CR>"):with_noremap():with_desc("edit: Trim EOL trailing space"),
-	["n|<leader><CR>"] = map_cmd("i<CR><Esc>k$"):with_noremap():with_desc("edit: Break this line and move right content to next line"),
+	["n|<leader><CR>"] = map_cmd("i<CR><Esc>k$")
+		:with_noremap()
+		:with_desc("edit: Break this line and move right content to next line"),
 	["n|<S-Up>"] = map_cr("exe 'move -' . (1 + v:count1)"):with_desc("edit: Move this line [count] up"),
 	["n|<S-Down>"] = map_cr("exe 'move +' . v:count1"):with_desc("edit: Move this line [count] down"),
 	["v|<S-Up>"] = map_cmd(":move '<-2<CR>gv"):with_desc("edit: Move select line(s) up"),
@@ -27,10 +29,22 @@ return {
 	["n|<leader><Up>"] = map_cmd("yyP"):with_desc("edit: Yank line and paste above"),
 	["n|<leader><Down>"] = map_cmd("yyp"):with_desc("edit: Yank line and paste below"),
 	-- Range editing
-	["n|[\\"] = map_cmd(":<C-u>put! =repeat(nr2char(10), v:count1)<CR>'["):with_noremap():with_silent():with_desc("edit: Insert [count] line(s) above the current line"),
-	["n|]\\"] = map_cmd(":<C-u>put =repeat(nr2char(10), v:count1)<CR>"):with_noremap():with_silent():with_desc("edit: Append [count] line(s) below the current line"),
-	["n|[<space>"] = map_cmd(":<C-u>exe 'normal! i' . repeat(' ', v:count1)<CR>l"):with_noremap():with_silent():with_desc("edit: Insert [count] space(s) behind the cursor"),
-	["n|]<space>"] = map_cmd("my:<C-u>exe 'normal! a '<CR>`y"):with_noremap():with_silent():with_desc("edit: Append space after the cursor"),
+	["n|[\\"] = map_cmd(":<C-u>put! =repeat(nr2char(10), v:count1)<CR>'[")
+		:with_noremap()
+		:with_silent()
+		:with_desc("edit: Insert [count] line(s) above the current line"),
+	["n|]\\"] = map_cmd(":<C-u>put =repeat(nr2char(10), v:count1)<CR>")
+		:with_noremap()
+		:with_silent()
+		:with_desc("edit: Append [count] line(s) below the current line"),
+	["n|[<space>"] = map_cmd(":<C-u>exe 'normal! i' . repeat(' ', v:count1)<CR>l")
+		:with_noremap()
+		:with_silent()
+		:with_desc("edit: Insert [count] space(s) behind the cursor"),
+	["n|]<space>"] = map_cmd("my:<C-u>exe 'normal! a '<CR>`y")
+		:with_noremap()
+		:with_silent()
+		:with_desc("edit: Append space after the cursor"),
 	-- Register operations
 	["n|sc"] = map_cmd('"ayiw'):with_noremap():with_desc("yank a word into register a"),
 	["n|sv"] = map_cmd('viw"ap'):with_noremap():with_desc("paste override a word with register a"),
@@ -40,10 +54,18 @@ return {
 	["n|sa"] = map_cmd(":%s/<C-R>a/"):with_noremap():with_desc("replace register a"),
 	["n|s/"] = map_cmd(":%s/<C-R>//"):with_noremap():with_desc("replace search word"),
 	["n|sr"] = map_cmd(":%s/\\<<C-R><C-W>\\>/"):with_noremap():with_desc("replace the word under the cursor"),
-	["n|<Leader>'"] = map_cmd("viw<ESC>bi'<ESC>ea'<ESC>"):with_noremap():with_desc("edit: Wrap the word with single quote"),
-	["n|<Leader>\""] = map_cmd('viw<ESC>bi"<ESC>ea"<ESC>'):with_noremap():with_desc("edit: Wrap the word with double quote"),
-	["v|<Leader>'"] = map_cmd("<ESC>`>a'<ESC>`<i'<ESC>"):with_noremap():with_desc("edit: Wrap the selection with single quote"),
-	["v|<Leader>\""] = map_cmd('<ESC>`>a"<ESC>`<i"<ESC>'):with_noremap():with_desc("edit: Wrap the selection with double quote"),
+	["n|<Leader>'"] = map_cmd("viw<ESC>bi'<ESC>ea'<ESC>")
+		:with_noremap()
+		:with_desc("edit: Wrap the word with single quote"),
+	['n|<Leader>"'] = map_cmd('viw<ESC>bi"<ESC>ea"<ESC>')
+		:with_noremap()
+		:with_desc("edit: Wrap the word with double quote"),
+	["v|<Leader>'"] = map_cmd("<ESC>`>a'<ESC>`<i'<ESC>")
+		:with_noremap()
+		:with_desc("edit: Wrap the selection with single quote"),
+	['v|<Leader>"'] = map_cmd('<ESC>`>a"<ESC>`<i"<ESC>')
+		:with_noremap()
+		:with_desc("edit: Wrap the selection with double quote"),
 	["n|<Leader>;"] = map_cmd("mzA;<ESC>`z"):with_noremap():with_desc("edit: Append a ';' after EOL"),
 	-- Insert mode overrides
 	["i|<Find>"] = map_cmd("<Home>"):with_noremap():with_silent():with_desc("Move cursor to line start"),

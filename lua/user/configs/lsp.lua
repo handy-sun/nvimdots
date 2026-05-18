@@ -52,14 +52,17 @@ if clangd then
 			clangd,
 			"-j=9",
 			"--enable-config",
-			"--query-driver=" .. table.concat(vim.tbl_filter(function(path)
-				return path ~= nil
-			end, {
-				system_exepath("clang++"),
-				system_exepath("clang"),
-				system_exepath("gcc"),
-				system_exepath("g++"),
-			}), ","),
+			"--query-driver=" .. table.concat(
+				vim.tbl_filter(function(path)
+					return path ~= nil
+				end, {
+					system_exepath("clang++"),
+					system_exepath("clang"),
+					system_exepath("gcc"),
+					system_exepath("g++"),
+				}),
+				","
+			),
 			"--all-scopes-completion",
 			"--background-index",
 			"--clang-tidy",

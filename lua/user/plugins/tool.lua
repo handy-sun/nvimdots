@@ -1,11 +1,11 @@
 local tool = {}
 
-tool['junegunn/fzf'] = {
+tool["junegunn/fzf"] = {
 	lazy = true,
-	ft = 'fzf',
+	ft = "fzf",
 	init = function()
 		vim.g.fzf_buffers_jump = 1
-	end
+	end,
 }
 
 tool["folke/which-key.nvim"] = {
