@@ -38,7 +38,7 @@ return {
 		-- remove_blankline_trail = false,
 	},
 	scope = {
-		-- char = "|",
+		char = "│",
 		highlight = hl_rainbow,
 	},
 }
