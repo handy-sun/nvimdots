@@ -30,6 +30,7 @@ end
 ---@type string[]
 settings["treesitter_deps"] = function()
 	return {
+		"asm",
 		"bash",
 		"c",
 		"cpp",
@@ -64,7 +65,9 @@ settings["treesitter_deps"] = function()
 		"python",
 		"rust",
 		"sql",
+		"ssh_config",
 		"tmux",
+		"toml",
 		"typescript",
 		"vim",
 		"vimdoc",
