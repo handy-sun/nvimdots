@@ -82,7 +82,6 @@ end
 ---@type string[]
 settings["null_ls_deps"] = function()
 	return {
-		"clang_format",
 		"shfmt",
 		"vint",
 	}
