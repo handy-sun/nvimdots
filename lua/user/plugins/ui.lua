@@ -91,6 +91,8 @@ ui["folke/noice.nvim"] = {
 		"hrsh7th/nvim-cmp",
 	},
 	config = function()
+		local boxed_message = "boxed_message"
+
 		require("noice").setup({
 			cmdline = {
 				enabled = true,
@@ -98,17 +100,52 @@ ui["folke/noice.nvim"] = {
 			},
 			messages = {
 				enabled = true,
-				view = "mini",
-				view_error = "mini",
-				view_warn = "mini",
+				view = boxed_message,
+				view_error = boxed_message,
+				view_warn = boxed_message,
 				view_history = "mini",
 				view_search = "mini",
 			},
 			notify = {
 				enabled = true,
-				view = "mini",
+				view = boxed_message,
 			},
 			views = {
+				[boxed_message] = {
+					backend = "mini",
+					relative = "editor",
+					align = "message-left",
+					timeout = 3000,
+					reverse = true,
+					focusable = false,
+					position = {
+						row = -2,
+						col = "100%",
+					},
+					size = {
+						width = "auto",
+						height = "auto",
+						max_height = 8,
+					},
+					border = {
+						style = "rounded",
+						padding = { 0, 1 },
+					},
+					zindex = 60,
+					win_options = {
+						winbar = "",
+						foldenable = false,
+						winblend = 0,
+						winhighlight = {
+							Normal = "NoiceMini",
+							FloatBorder = "NoiceCmdlinePopupBorder",
+							FloatTitle = "NoiceCmdlinePopupTitle",
+							IncSearch = "",
+							CurSearch = "",
+							Search = "",
+						},
+					},
+				},
 				cmdline_popup = {
 					position = {
 						row = "50%",
@@ -142,17 +179,23 @@ ui["folke/noice.nvim"] = {
 					opts = { skip = true },
 				},
 				{
-					view = "mini",
+					view = boxed_message,
 					filter = {
 						any = {
 							{ event = "msg_show" },
 							{ event = "msg_showmode" },
 							{ event = "msg_showcmd" },
 							{ event = "msg_ruler" },
-							{ event = "notify" },
 						},
 					},
-					opts = { replace = true, merge = true },
+					opts = { replace = true, merge = true, title = "Messages" },
+				},
+				{
+					view = boxed_message,
+					filter = {
+						event = "notify",
+					},
+					opts = { replace = true, merge = true, title = "Notify" },
 				},
 			},
 			lsp = {
