@@ -33,6 +33,20 @@ local function start_on_filetype(name, config, pattern)
 	})
 end
 
+local function nil_show_message_request_handler(err, params, ctx, config)
+	if
+		params
+		and params.message
+		and params.message:find("Fetching flake with inputs", 1, true)
+		and params.actions
+		and params.actions[1]
+	then
+		return params.actions[1]
+	end
+
+	return vim.lsp.handlers["window/showMessageRequest"](err, params, ctx, config)
+end
+
 local clangd = system_exepath("clangd")
 if clangd then
 	local clangd_config = {
@@ -102,6 +116,9 @@ if nil_ls then
 		capabilities = base_opts.capabilities,
 		filetypes = { "nix" },
 		root_markers = { "flake.nix", ".git" },
+		handlers = {
+			["window/showMessageRequest"] = nil_show_message_request_handler,
+		},
 	}
 	require("modules.utils").register_server("nil_ls", nil_config)
 	start_on_filetype("nil_ls", nil_config, nil_config.filetypes)
