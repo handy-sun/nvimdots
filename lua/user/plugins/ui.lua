@@ -83,6 +83,15 @@ ui["mikavilpas/yazi.nvim"] = {
 	end,
 }
 
+ui["petertriho/nvim-scrollbar"] = {
+	lazy = true,
+	event = { "BufReadPost", "BufAdd", "BufNewFile" },
+	config = require("user.configs.scrollbar"),
+	dependencies = {
+		"lewis6991/gitsigns.nvim",
+	},
+}
+
 ui["folke/noice.nvim"] = {
 	event = "VeryLazy",
 	dependencies = {
