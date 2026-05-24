@@ -28,13 +28,7 @@ editor["ojroques/nvim-bufdel"] = {
 	lazy = true,
 	cmd = { "BufDel", "BufDelAll", "BufDelOthers" },
 }
--- NOTE: `flash.nvim` is a powerful plugin that can be used as partial or complete replacements for:
---  > `hop.nvim`,
---  > `wilder.nvim`
---  > `nvim-treehopper`
--- Considering its steep learning curve as well as backward compatibility issues...
---  > We have no plan to remove the above plugins for the time being.
--- But as usual, you can always tweak the plugin to your liking.
+-- NOTE: `flash.nvim` replaces `hop.nvim` and `nvim-treehopper`.
 editor["folke/flash.nvim"] = {
 	lazy = true,
 	event = { "CursorHold", "CursorHoldI" },
@@ -102,7 +96,6 @@ editor["nvim-treesitter/nvim-treesitter"] = {
 	end,
 	config = require("editor.treesitter"),
 	dependencies = {
-		{ "mfussenegger/nvim-treehopper" },
 		{
 			"nvim-treesitter/nvim-treesitter-textobjects",
 			branch = "main",

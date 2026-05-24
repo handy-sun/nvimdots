@@ -40,7 +40,7 @@ return function()
 			fzf = true,
 			gitsigns = true,
 			grug_far = true,
-			hop = true,
+			flash = true,
 			indent_blankline = { enabled = true, colored_indent_levels = true },
 			lsp_saga = true,
 			lsp_trouble = true,
@@ -142,8 +142,8 @@ return function()
 					GlanceListMatch = { fg = cp.lavender, style = { "bold" } },
 					GlanceFoldIcon = { fg = cp.green },
 
-					-- For nvim-treehopper
-					TSNodeKey = {
+					-- For flash.nvim treesitter select
+					FlashLabel = {
 						fg = cp.peach,
 						bg = transparent_background and cp.none or cp.base,
 						style = { "bold", "underline" },

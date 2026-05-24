@@ -51,12 +51,9 @@ completion["hrsh7th/nvim-cmp"] = {
 		{ "lukas-reineke/cmp-under-comparator" },
 		{ "saadparwaiz1/cmp_luasnip" },
 		{ "hrsh7th/cmp-nvim-lsp" },
-		{ "andersevenrud/cmp-tmux" },
 		{ "hrsh7th/cmp-path" },
-		{ "f3fora/cmp-spell" },
 		{ "hrsh7th/cmp-buffer" },
 		{ "hrsh7th/cmp-cmdline" },
-		{ "kdheepak/cmp-latex-symbols" },
 	},
 }
 completion["zbirenbaum/copilot.lua"] = {

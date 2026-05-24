@@ -102,12 +102,53 @@ local mappings = {
 		["n|<leader>gd"] = map_cr("DiffviewOpen"):with_silent():with_noremap():with_desc("git: Show diff"),
 		["n|<leader>gD"] = map_cr("DiffviewClose"):with_silent():with_noremap():with_desc("git: Close diff"),
 
-		-- Plugin: hop.nvim
-		["nv|<leader>w"] = map_cmd("<Cmd>HopWordMW<CR>"):with_noremap():with_desc("jump: Goto word"),
-		["nv|<leader>j"] = map_cmd("<Cmd>HopLineMW<CR>"):with_noremap():with_desc("jump: Goto line"),
-		["nv|<leader>k"] = map_cmd("<Cmd>HopLineMW<CR>"):with_noremap():with_desc("jump: Goto line"),
-		["nv|<leader>c"] = map_cmd("<Cmd>HopChar1MW<CR>"):with_noremap():with_desc("jump: Goto one char"),
-		["nv|<leader>C"] = map_cmd("<Cmd>HopChar2MW<CR>"):with_noremap():with_desc("jump: Goto two chars"),
+		-- Plugin: flash.nvim (replaces hop.nvim + nvim-treehopper)
+		["nv|<leader>w"] = map_callback(function()
+				require("flash").jump()
+			end)
+			:with_noremap()
+			:with_silent()
+			:with_desc("jump: Goto word"),
+		["nv|<leader>j"] = map_callback(function()
+				require("flash").jump({
+					search = { mode = "search", max_length = 0 },
+					label = { after = { 0, 0 } },
+					pattern = "^",
+				})
+			end)
+			:with_noremap()
+			:with_silent()
+			:with_desc("jump: Goto line"),
+		["nv|<leader>k"] = map_callback(function()
+				require("flash").jump({
+					search = { mode = "search", max_length = 0 },
+					label = { after = { 0, 0 } },
+					pattern = "^",
+				})
+			end)
+			:with_noremap()
+			:with_silent()
+			:with_desc("jump: Goto line"),
+		["nv|<leader>c"] = map_callback(function()
+				require("flash").jump({
+					pattern = vim.v.count == 0 and "" or tostring(vim.v.count),
+					search = { mode = "search", max_length = 1 },
+					label = { after = { 0, 0 } },
+				})
+			end)
+			:with_noremap()
+			:with_silent()
+			:with_desc("jump: Goto one char"),
+		["nv|<leader>C"] = map_callback(function()
+				require("flash").jump({
+					pattern = vim.v.count == 0 and "" or tostring(vim.v.count),
+					search = { max_length = 2 },
+					label = { after = { 0, 0 } },
+				})
+			end)
+			:with_noremap()
+			:with_silent()
+			:with_desc("jump: Goto two chars"),
 
 		-- Plugin: grug-far
 		["n|<leader>Ss"] = map_callback(function()
@@ -135,8 +176,13 @@ local mappings = {
 			:with_noremap()
 			:with_desc("editn: search & replace current word (file)"),
 
-		-- Plugin: nvim-treehopper
-		["o|m"] = map_cu("lua require('tsht').nodes()"):with_silent():with_desc("jump: Operate across syntax tree"),
+		-- Plugin: flash.nvim (treesitter select, replaces nvim-treehopper)
+		["o|m"] = map_callback(function()
+				require("flash").treesitter()
+			end)
+			:with_noremap()
+			:with_silent()
+			:with_desc("jump: Operate across syntax tree"),
 
 		-- Plugin: suda.vim
 		["n|<A-s>"] = map_cu("SudaWrite"):with_silent():with_noremap():with_desc("editn: Save file using sudo"),

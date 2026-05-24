@@ -143,10 +143,7 @@ return function()
 					orgmode = "[ORG]",
 					nvim_lsp = "[LSP]",
 					path = "[PATH]",
-					tmux = "[TMUX]",
-					latex_symbols = "[LTEX]",
 					luasnip = "[SNIP]",
-					spell = "[SPELL]",
 				}, {
 					__index = function()
 						return "[BTN]" -- builtin/unknown source names
@@ -222,8 +219,6 @@ return function()
 			{ name = "nvim_lsp", max_item_count = 350 },
 			{ name = "luasnip" },
 			{ name = "path" },
-			{ name = "spell" },
-			{ name = "tmux" },
 			{ name = "orgmode" },
 			{
 				name = "buffer",
@@ -233,7 +228,6 @@ return function()
 					end,
 				},
 			},
-			{ name = "latex_symbols" },
 			{ name = "copilot" },
 		},
 		experimental = {

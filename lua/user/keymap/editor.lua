@@ -2,6 +2,7 @@
 local bind = require("keymap.bind")
 local map_cr = bind.map_cr
 local map_cmd = bind.map_cmd
+local map_callback = bind.map_callback
 
 return {
 	-- Disable upstream visual line shift (replaced by custom)
@@ -12,8 +13,13 @@ return {
 	-- Suckless overrides
 	["n|n"] = map_cmd("'Nn'[v:searchforward]"):with_noremap():with_expr():with_desc("Always search forward"),
 	["n|N"] = map_cmd("'nN'[v:searchforward]"):with_noremap():with_expr():with_desc("Always search backward"),
-	-- Hop
-	["nv|<leader>2"] = map_cmd("<Cmd>HopWordMW<CR>"):with_noremap():with_desc("jump: Goto word"),
+	-- Flash (replaces hop)
+	["nv|<leader>2"] = map_callback(function()
+			require("flash").jump()
+		end)
+		:with_noremap()
+		:with_silent()
+		:with_desc("jump: Goto word"),
 	-- Comment
 	["n|<leader>/"] = map_cmd("gcc"):with_silent():with_desc("edit: Toggle comment for line (custom)"),
 	["v|<leader>/"] = map_cmd("gc"):with_silent():with_desc("edit: Toggle comment for line in Visual(custom)"),

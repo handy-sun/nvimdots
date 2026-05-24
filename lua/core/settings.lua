@@ -25,9 +25,6 @@ settings["format_notify"] = true
 --  > The buffer is under version control (Git or Mercurial);
 --  > Any server attached to the buffer supports the |DocumentRangeFormattingProvider| capability.
 -- Otherwise, Neovim will fall back to formatting the whole buffer and issue a warning.
----@type boolean
-settings["format_modifications_only"] = false
-
 -- Filetypes in this list will skip LSP formatting if the value is true.
 ---@type table<string, boolean>
 settings["formatter_block_list"] = {

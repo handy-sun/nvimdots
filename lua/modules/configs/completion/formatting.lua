@@ -4,7 +4,6 @@ local settings = require("core.settings")
 local disabled_workspaces = settings.format_disabled_dirs
 local format_on_save = settings.format_on_save
 local format_notify = settings.format_notify
-local format_modifications_only = settings.format_modifications_only
 local server_formatting_block_list = settings.server_formatting_block_list
 local format_timeout = settings.format_timeout
 
@@ -166,21 +165,7 @@ function M.format(opts)
 			return
 		end
 
-		if
-			format_modifications_only
-			and require("lsp-format-modifications").format_modifications(client, bufnr).success
-		then
-			if format_notify then
-				vim.notify(
-					string.format("[LSP] Format changed lines successfully with %s!", client.name),
-					vim.log.levels.INFO,
-					{ title = "LSP Range Format Success" }
-				)
-			end
-			return
-		end
-
-		-- Fall back to format the whole buffer (even if partial formatting failed)
+		-- Format the whole buffer
 		local params = vim.lsp.util.make_formatting_params(opts.formatting_options)
 		local result, err = client:request_sync("textDocument/formatting", params, timeout_ms, bufnr)
 		if result and result.result then

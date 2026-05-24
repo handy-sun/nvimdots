@@ -97,6 +97,17 @@ settings["disabled_plugins"] = {
 	"dstein64/nvim-scrollview",
 	--- E704 on nvim 0.12+, replaced by handy-sun fork
 	"gelguy/wilder.nvim",
+	--- replaced by flash.nvim
+	"smoka7/hop.nvim",
+	"mfussenegger/nvim-treehopper",
+	--- unused cmp sources
+	"andersevenrud/cmp-tmux",
+	"f3fora/cmp-spell",
+	"kdheepak/cmp-latex-symbols",
+	--- unused: only format_modifications_only=false, never actually used
+	"joechrisellis/lsp-format-modifications.nvim",
+	--- unused: paint.nvim provides no meaningful value
+	"folke/paint.nvim",
 }
 -- Set the dashboard startup image here
 -- You can generate the ascii image using: https://github.com/TheZoraiz/ascii-image-converter
