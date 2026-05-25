@@ -61,6 +61,13 @@ return {
 	["n|<leader>m"] = map_cr("Noice history"):with_noremap():with_desc("message: Show history"),
 	["n|<leader>M"] = map_cr("Noice errors"):with_noremap():with_desc("message: Show errors"),
 	["n|sd"] = map_cr("BufDel"):with_noremap():with_silent():with_desc("buffer: Close current"),
+	-- Dedicated fzf-lua entrypoints while keeping Telescope as the default backend
+	["n|<leader>fF"] = map_cr("FzfLua files"):with_noremap():with_silent():with_desc("tool: Find files with fzf-lua"),
+	["n|<leader>fG"] = map_cr("FzfLua live_grep"):with_noremap():with_silent():with_desc("tool: Grep with fzf-lua"),
+	["n|<leader>fB"] = map_cr("FzfLua buffers")
+		:with_noremap()
+		:with_silent()
+		:with_desc("tool: Find buffers with fzf-lua"),
 	-- Quickfix
 	["n|z["] = map_cr("exe v:count1 . 'cprevious'")
 		:with_noremap()

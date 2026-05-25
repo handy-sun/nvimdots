@@ -15,6 +15,7 @@ tool["folke/which-key.nvim"] = {
 -- Override: remove cond restriction so fzf-lua loads alongside telescope
 tool["ibhagwan/fzf-lua"] = {
 	lazy = true,
+	cond = true,
 	cmd = "FzfLua",
 	config = require("tool.fzf-lua"),
 	dependencies = { "nvim-tree/nvim-web-devicons" },
