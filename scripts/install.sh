@@ -125,14 +125,14 @@ prompt_confirm() {
 		read -r -p "$1 [Y/n]: " choice
 		case "$choice" in
 		[yY][eE][sS] | [yY])
-			return 1
+			return 0
 			;;
 		[nN][oO] | [nN])
-			return 0
+			return 1
 			;;
 		*)
 			if [[ -z "$choice" ]]; then
-				return 1
+				return 0
 			fi
 			printf "${tty_red}%s\n\n${tty_reset}" "Input invalid! Please enter one of the following: '[y/yes]' or '[n/no]'."
 			;;
@@ -141,20 +141,23 @@ prompt_confirm() {
 }
 
 check_ssh() {
+	local ssh_status
+
 	info "Validating SSH connection..."
-	ssh -T git@github.com &>/dev/null
-	if ! [ $? -eq 1 ]; then
-		info "We'll use HTTPS to fetch and update plugins."
-		return 0
-	else
+	ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new -T git@github.com </dev/null &>/dev/null
+	ssh_status=$?
+
+	if [[ "${ssh_status}" -eq 1 ]]; then
 		prompt_confirm "Do you prefer to use SSH to fetch and update plugins? (otherwise HTTPS)"
-		return $?
+	else
+		info "SSH auth is unavailable or not ready; we'll use HTTPS to fetch and update plugins."
+		return 1
 	fi
 }
 
 clone_pref() {
 	info "Checking 'git clone' preferences..."
-	if ! prompt_confirm "Would you like to perform a shallow clone ('--depth=1')?"; then
+	if prompt_confirm "Would you like to perform a shallow clone ('--depth=1')?"; then
 		CLONE_ATTR+=("--depth=1")
 	fi
 }
@@ -246,7 +249,7 @@ if [[ -n "${NONINTERACTIVE-}" ]]; then
 	USE_SSH=0
 fi
 
-info "This script will install ayamir/nvimdots to:"
+info "This script will install handy-sun/nvimdots to:"
 echo "${DEST_DIR}"
 
 if [[ -d "${DEST_DIR}" ]]; then
@@ -258,7 +261,7 @@ if [[ -z "${NONINTERACTIVE-}" ]]; then
 	ring_bell
 	wait_for_user
 
-	if check_ssh; then
+	if ! check_ssh; then
 		USE_SSH=0
 	fi
 	clone_pref
@@ -270,12 +273,12 @@ fi
 
 info "Fetching in progress..."
 if [[ "${USE_SSH}" -eq "1" ]]; then
-	clone_repo "git@github.com:ayamir/nvimdots.git"
+	clone_repo "git@github.com:handy-sun/nvimdots.git"
 else
-	clone_repo "https://github.com/ayamir/nvimdots.git"
+	clone_repo "https://github.com/handy-sun/nvimdots.git"
 fi
 
-cd "${DEST_DIR}" || return
+cd "${DEST_DIR}" || abort "Failed to enter ${DEST_DIR}"
 execute "cp" "-fRpP" "${DEST_DIR}/lua/user_template/" "${DEST_DIR}/lua/user"
 
 if [[ "${USE_SSH}" -eq "0" ]]; then
@@ -292,9 +295,9 @@ cat <<EOS
 
 Thank you for using this set of configuration!
 - Project Homepage:
-    ${tty_underline}https://github.com/ayamir/nvimdots${tty_reset}
+    ${tty_underline}https://github.com/handy-sun/nvimdots${tty_reset}
 - Further documentation (including executables you ${tty_bold}must${tty_reset} install for full functionality):
-    ${tty_underline}https://github.com/ayamir/nvimdots/wiki/Prerequisites${tty_reset}
+    ${tty_underline}https://github.com/handy-sun/nvimdots/wiki/Prerequisites${tty_reset}
 EOS
 
 if [[ -z "${NONINTERACTIVE-}" ]]; then
