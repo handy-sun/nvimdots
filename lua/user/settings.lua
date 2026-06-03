@@ -16,6 +16,12 @@ settings["format_notify"] = false
 -- Overwrite colorscheme to onedark
 settings["colorscheme"] = "onedark"
 
+settings["neovide_config"] = {
+	fullscreen = false,
+	remember_window_size = true,
+	remember_window_position = true,
+}
+
 -- plug: mason-lspconfig: ensure_installed used
 -- @type string[]
 settings["lsp_deps"] = function()
