@@ -32,4 +32,19 @@ vim.cmd(string.format([[function! GetAbsFileDir()
     return expand('%%:p:h') . '%s'
 endfunction]], path_sep))
 
+--- Auto-set cwd to project root using built-in vim.fs.root()
+local root_markers = { ".git", "package.json", "Makefile", "pyproject.toml", ".nvim.lua" }
+vim.api.nvim_create_autocmd("BufEnter", {
+	group = vim.api.nvim_create_augroup("AutoRoot", { clear = true }),
+	callback = function(args)
+		if vim.bo[args.buf].buftype ~= "" then
+			return
+		end
+		local root = vim.fs.root(args.buf, root_markers)
+		if root and root ~= vim.uv.cwd() then
+			vim.cmd.cd(root)
+		end
+	end,
+})
+
 return options

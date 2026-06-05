@@ -113,6 +113,8 @@ settings["disabled_plugins"] = {
 	"joechrisellis/lsp-format-modifications.nvim",
 	--- unused: paint.nvim provides no meaningful value
 	"folke/paint.nvim",
+	--- replaced by built-in vim.fs.root()
+	"DrKJeff16/project.nvim",
 }
 -- Set the dashboard startup image here
 -- You can generate the ascii image using: https://github.com/TheZoraiz/ascii-image-converter
