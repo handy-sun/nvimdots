@@ -27,10 +27,9 @@ vim.cmd([[
 command! -nargs=+ -complete=file CpGrep execute 'silent grep! <args>' | copen 9 | redraw!
 ]])
 
-vim.cmd([[
-function! GetAbsFileDir()
-    return expand('%:p:h') . '/'
-endfunction
-]])
+local path_sep = vim.fn.has("win32") == 1 and "\\" or "/"
+vim.cmd(string.format([[function! GetAbsFileDir()
+    return expand('%%:p:h') . '%s'
+endfunction]], path_sep))
 
 return options
