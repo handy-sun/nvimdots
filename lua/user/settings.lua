@@ -98,7 +98,6 @@ end
 settings["disabled_plugins"] = {
 	--- large version update bad
 	"andymass/vim-matchup",
-	"hiphish/rainbow-delimiters.nvim",
 	--- replaced by petertriho/nvim-scrollbar for git overview marks
 	"dstein64/nvim-scrollview",
 	--- E704 on nvim 0.12+, replaced by handy-sun fork
