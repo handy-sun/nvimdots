@@ -87,6 +87,12 @@ return function()
 		},
 		dossier = {
 			{ "Sessions", extensions.persisted.persisted },
+			{
+				"Projects",
+				function()
+					extensions.project.project{}
+				end,
+			},
 			{ "Zoxide", extensions.zoxide.list },
 		},
 		misc = {
@@ -111,7 +117,7 @@ return function()
 		collections[kind] = init
 	end
 
-	require("modules.utils").load_plugin("search", {
+	require("search").setup({
 		prompt_position = prompt_pos,
 		collections = collections,
 	})

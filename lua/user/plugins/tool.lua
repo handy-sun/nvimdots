@@ -62,4 +62,8 @@ tool["ibhagwan/fzf-lua"] = {
 -- 	end
 -- }
 
+tool["nvim-telescope/telescope-project.nvim"] = {
+	dependencies = { "nvim-telescope/telescope.nvim" },
+}
+
 return tool

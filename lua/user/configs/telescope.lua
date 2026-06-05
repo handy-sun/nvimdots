@@ -2,7 +2,7 @@ return function()
 	local icons = { ui = require("modules.utils.icons").get("ui", true) }
 	local lga_actions = require("telescope-live-grep-args.actions")
 
-	require("modules.utils").load_plugin("telescope", {
+	require("telescope").setup({
 		defaults = {
 			vimgrep_arguments = {
 				"rg",
@@ -84,6 +84,7 @@ return function()
 	require("telescope").load_extension("live_grep_args")
 	require("telescope").load_extension("notify")
 	-- project.nvim removed, using built-in vim.fs.root() instead
+	require("telescope").load_extension("project")
 	require("telescope").load_extension("undo")
 	require("telescope").load_extension("zoxide")
 	require("telescope").load_extension("persisted")
