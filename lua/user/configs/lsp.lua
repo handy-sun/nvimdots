@@ -13,6 +13,72 @@ local function system_exepath(bin)
 	return nil
 end
 
+local source_extensions = { c = true, cc = true, cpp = true, cxx = true, m = true, mm = true }
+local header_extensions = { h = true, hh = true, hpp = true, hxx = true }
+
+local function find_source_header_fallback(bufnr, client)
+	local current = vim.api.nvim_buf_get_name(bufnr)
+	local basename = vim.fn.fnamemodify(current, ":t:r")
+	local ext = vim.fn.fnamemodify(current, ":e")
+	local targets = source_extensions[ext] and header_extensions or source_extensions
+	local root = client and client.config and client.config.root_dir or vim.fs.root(bufnr, { ".git" })
+
+	if not root then
+		return nil
+	end
+
+	local matches = vim.fs.find(function(name, path)
+		local candidate_ext = name:match("%.([^.]+)$")
+		return vim.fn.fnamemodify(name, ":r") == basename
+			and targets[candidate_ext] == true
+			and vim.fs.joinpath(path, name) ~= current
+	end, {
+		path = root,
+		type = "file",
+		limit = 1,
+	})
+
+	return matches[1]
+end
+
+local function switch_source_header(bufnr, client)
+	local method_name = "textDocument/switchSourceHeader"
+	if not client or not client:supports_method(method_name) then
+		local fallback = find_source_header_fallback(bufnr, client)
+		if fallback then
+			vim.cmd.edit(fallback)
+			return
+		end
+
+		vim.notify(
+			("Method %s is not supported by any active server attached to buffer"):format(method_name),
+			vim.log.levels.ERROR,
+			{ title = "LSP Error!" }
+		)
+		return
+	end
+
+	local params = vim.lsp.util.make_text_document_params(bufnr)
+	client:request(method_name, params, function(err, result)
+		if err then
+			error(tostring(err))
+		end
+
+		if result then
+			vim.cmd.edit(vim.uri_to_fname(result))
+			return
+		end
+
+		local fallback = find_source_header_fallback(bufnr, client)
+		if fallback then
+			vim.cmd.edit(fallback)
+			return
+		end
+
+		vim.notify("corresponding file cannot be determined")
+	end, bufnr)
+end
+
 local function start_on_filetype(name, config, pattern)
 	vim.api.nvim_create_autocmd("FileType", {
 		group = vim.api.nvim_create_augroup("UserSystemLsp" .. name, { clear = true }),
@@ -59,6 +125,8 @@ if clangd then
 			".clang-format",
 			"compile_commands.json",
 			"compile_flags.txt",
+			"Makefile",
+			"makefile",
 			"configure.ac",
 			".git",
 		},
@@ -89,6 +157,11 @@ if clangd then
 			"--limit-results=300",
 			"--pch-storage=memory",
 		},
+		on_attach = function(client, bufnr)
+			vim.api.nvim_buf_create_user_command(bufnr, "LspClangdSwitchSourceHeader", function()
+				switch_source_header(bufnr, client)
+			end, { desc = "Switch between source/header" })
+		end,
 	}
 	require("modules.utils").register_server("clangd", clangd_config)
 	start_on_filetype("clangd", clangd_config, clangd_config.filetypes)

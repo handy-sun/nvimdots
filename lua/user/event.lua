@@ -13,7 +13,7 @@ local definitions = {
 		{
 			"FileType",
 			"c,cpp",
-			"nnoremap <leader>h :ClangdSwitchSourceHeader<CR>",
+			"nnoremap <silent> <buffer> <leader>h <Cmd>LspClangdSwitchSourceHeader<CR>",
 		},
 	},
 }

@@ -3,6 +3,7 @@ local completion = {}
 completion["neovim/nvim-lspconfig"] = {
 	lazy = true,
 	event = { "CursorHold", "CursorHoldI" },
+	ft = { "c", "cpp", "objc", "objcpp", "cuda" },
 	config = require("completion.lsp"),
 	dependencies = {
 		{ "mason-org/mason.nvim" },
