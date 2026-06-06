@@ -14,7 +14,15 @@ return {
 		:with_noremap()
 		:with_silent()
 		:with_desc("buffer: Switch to [count] prev"),
+	["n|<leader>,"] = map_cu("exe v:count1 . 'bprevious'")
+		:with_noremap()
+		:with_silent()
+		:with_desc("buffer: Switch to [count] prev"),
 	["n|<leader><Right>"] = map_cu("exe v:count1 . 'bnext'")
+		:with_noremap()
+		:with_silent()
+		:with_desc("buffer: Switch to [count] next"),
+	["n|<leader>."] = map_cu("exe v:count1 . 'bnext'")
 		:with_noremap()
 		:with_silent()
 		:with_desc("buffer: Switch to [count] next"),
