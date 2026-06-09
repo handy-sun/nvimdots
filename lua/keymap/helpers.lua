@@ -49,6 +49,21 @@ M.toggle_inlayhint = function()
 	)
 end
 
+M.lsp_info = function()
+	if not pcall(vim.cmd, "LspInfo") then
+		vim.cmd("checkhealth vim.lsp")
+	end
+end
+
+M.lsp_restart = function()
+	if not pcall(vim.cmd, "lsp restart") then
+		local ok = pcall(vim.cmd, "LspRestart")
+		if not ok then
+			vim.notify("No LSP restart command is available", vim.log.levels.WARN, { title = "LSP" })
+		end
+	end
+end
+
 M.toggle_virtuallines = function()
 	require("tiny-inline-diagnostic").toggle()
 	vim.notify(
