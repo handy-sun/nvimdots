@@ -146,6 +146,7 @@ function autocmd.load_autocmds()
 			{ "FileType", "alpha", "setlocal showtabline=0" },
 			{ "FileType", "markdown", "setlocal wrap" },
 			{ "FileType", "dap-repl", "lua require('dap.ext.autocompl').attach()" },
+			{ "FileType", "c,cpp", "lua require('modules.utils.cpp_include').setup_buffer()" },
 			{
 				"FileType",
 				"c,cpp",

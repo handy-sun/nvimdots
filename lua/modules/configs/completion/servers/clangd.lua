@@ -1,25 +1,47 @@
 -- https://github.com/neovim/nvim-lspconfig/blob/master/lsp/clangd.lua
 
+local ok_cpp_include, cpp_include = pcall(require, "modules.utils.cpp_include")
+
+local function open_source_header(bufnr, splitcmd, result, client)
+	local path = result and vim.uri_to_fname(result)
+		or (ok_cpp_include and cpp_include.find_source_header_fallback(bufnr, client))
+
+	if path then
+		vim.api.nvim_command(splitcmd .. " " .. vim.fn.fnameescape(path))
+		return true
+	end
+
+	return false
+end
+
 local function switch_source_header_splitcmd(bufnr, splitcmd, client)
 	local method_name = "textDocument/switchSourceHeader"
 	---@diagnostic disable-next-line:param-type-mismatch
 	if not client or not client:supports_method(method_name) then
-		return vim.notify(
+		if open_source_header(bufnr, splitcmd, nil, client) then
+			return
+		end
+
+		vim.notify(
 			("Method %s is not supported by any active server attached to buffer"):format(method_name),
 			vim.log.levels.ERROR,
 			{ title = "LSP Error!" }
 		)
+		return
 	end
 	local params = vim.lsp.util.make_text_document_params(bufnr)
 	client:request(method_name, params, function(err, result)
 		if err then
 			error(tostring(err))
 		end
+		if open_source_header(bufnr, splitcmd, result, client) then
+			return
+		end
+
 		if not result then
 			vim.notify("corresponding file cannot be determined")
 			return
 		end
-		vim.api.nvim_command(splitcmd .. " " .. vim.uri_to_fname(result))
 	end, bufnr)
 end
 
@@ -86,7 +108,7 @@ return function(defaults)
 		on_attach = function(client, bufnr)
 			vim.api.nvim_buf_create_user_command(bufnr, "LspClangdSwitchSourceHeader", function()
 				switch_source_header_splitcmd(bufnr, "edit", client)
-			end, { desc = "Open source/header in a new vsplit" })
+			end, { desc = "Switch between source/header" })
 
 			vim.api.nvim_buf_create_user_command(bufnr, "LspClangdSwitchSourceHeaderVsplit", function()
 				switch_source_header_splitcmd(bufnr, "vsplit", client)

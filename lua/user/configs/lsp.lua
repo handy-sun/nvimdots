@@ -1,6 +1,7 @@
 local base_opts = {
 	capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities()),
 }
+local cpp_include = require("modules.utils.cpp_include")
 
 local function system_exepath(bin)
 	local mason_bin = vim.fn.stdpath("data") .. "/mason/bin/"
@@ -13,40 +14,12 @@ local function system_exepath(bin)
 	return nil
 end
 
-local source_extensions = { c = true, cc = true, cpp = true, cxx = true, m = true, mm = true }
-local header_extensions = { h = true, hh = true, hpp = true, hxx = true }
-
-local function find_source_header_fallback(bufnr, client)
-	local current = vim.api.nvim_buf_get_name(bufnr)
-	local basename = vim.fn.fnamemodify(current, ":t:r")
-	local ext = vim.fn.fnamemodify(current, ":e")
-	local targets = source_extensions[ext] and header_extensions or source_extensions
-	local root = client and client.config and client.config.root_dir or vim.fs.root(bufnr, { ".git" })
-
-	if not root then
-		return nil
-	end
-
-	local matches = vim.fs.find(function(name, path)
-		local candidate_ext = name:match("%.([^.]+)$")
-		return vim.fn.fnamemodify(name, ":r") == basename
-			and targets[candidate_ext] == true
-			and vim.fs.joinpath(path, name) ~= current
-	end, {
-		path = root,
-		type = "file",
-		limit = 1,
-	})
-
-	return matches[1]
-end
-
 local function switch_source_header(bufnr, client)
 	local method_name = "textDocument/switchSourceHeader"
 	if not client or not client:supports_method(method_name) then
-		local fallback = find_source_header_fallback(bufnr, client)
+		local fallback = cpp_include.find_source_header_fallback(bufnr, client)
 		if fallback then
-			vim.cmd.edit(fallback)
+			vim.cmd.edit(vim.fn.fnameescape(fallback))
 			return
 		end
 
@@ -65,13 +38,13 @@ local function switch_source_header(bufnr, client)
 		end
 
 		if result then
-			vim.cmd.edit(vim.uri_to_fname(result))
+			vim.cmd.edit(vim.fn.fnameescape(vim.uri_to_fname(result)))
 			return
 		end
 
-		local fallback = find_source_header_fallback(bufnr, client)
+		local fallback = cpp_include.find_source_header_fallback(bufnr, client)
 		if fallback then
-			vim.cmd.edit(fallback)
+			vim.cmd.edit(vim.fn.fnameescape(fallback))
 			return
 		end
 

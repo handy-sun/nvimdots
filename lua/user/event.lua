@@ -10,6 +10,7 @@ local definitions = {
 		{ "FileType", "systemd", "setlocal commentstring=#\\ %s" },
 		{ "FileType", "crontab", "setlocal nobackup nowritebackup" },
 		{ "FileType", "help", "if &buftype != 'quickfix' | wincmd L | vertical resize -10 | endif" },
+		{ "FileType", "c,cpp", "lua require('modules.utils.cpp_include').setup_buffer()" },
 		{
 			"FileType",
 			"c,cpp",
