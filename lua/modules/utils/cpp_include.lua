@@ -218,6 +218,14 @@ function M.makefile_include_dirs(root)
 	return dirs
 end
 
+function M.makefile_fallback_flags(root)
+	local flags = {}
+	for _, dir in ipairs(M.makefile_include_dirs(root)) do
+		table.insert(flags, "-I" .. dir)
+	end
+	return flags
+end
+
 local function file_exists(path)
 	return path and vim.fn.filereadable(path) == 1
 end

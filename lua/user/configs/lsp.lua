@@ -72,6 +72,32 @@ local function start_on_filetype(name, config, pattern)
 	})
 end
 
+local function has_compilation_database(root_dir)
+	return root_dir
+		and (
+			vim.fn.filereadable(vim.fs.joinpath(root_dir, "compile_commands.json")) == 1
+			or vim.fn.filereadable(vim.fs.joinpath(root_dir, "compile_flags.txt")) == 1
+		)
+end
+
+local function add_clangd_makefile_fallback_flags(params, config)
+	local root_dir = config and config.root_dir
+	if
+		root_dir
+		and not has_compilation_database(root_dir)
+		and vim.tbl_isempty(vim.tbl_get(params, "initializationOptions", "fallbackFlags") or {})
+	then
+		local fallback_flags = cpp_include.makefile_fallback_flags(root_dir)
+		if #fallback_flags > 0 then
+			params.initializationOptions = params.initializationOptions or {}
+			params.initializationOptions.fallbackFlags = fallback_flags
+			config.init_options = vim.tbl_deep_extend("force", config.init_options or {}, {
+				fallbackFlags = fallback_flags,
+			})
+		end
+	end
+end
+
 local function nil_show_message_request_handler(err, params, ctx, config)
 	if
 		params
@@ -135,6 +161,7 @@ if clangd then
 				switch_source_header(bufnr, client)
 			end, { desc = "Switch between source/header" })
 		end,
+		before_init = add_clangd_makefile_fallback_flags,
 	}
 	require("modules.utils").register_server("clangd", clangd_config)
 	start_on_filetype("clangd", clangd_config, clangd_config.filetypes)
