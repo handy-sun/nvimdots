@@ -41,7 +41,7 @@ return {
 		:with_noremap()
 		:with_desc("iswap: Move cursor node to another position"),
 	-- Plugin: nvim-tree
-	["n|<leader>ni"] = map_cr([[lua require('nvim-tree.api').tree.toggle_git_ignored_filter()]])
+	["n|<leader>ni"] = map_cr([[lua require('nvim-tree.api').filter.git.ignored.toggle()]])
 		:with_noremap()
 		:with_silent()
 		:with_desc("filetree: Toggle git-ignored files"),
