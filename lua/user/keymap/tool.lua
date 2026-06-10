@@ -40,6 +40,11 @@ return {
 		:with_silent()
 		:with_noremap()
 		:with_desc("iswap: Move cursor node to another position"),
+	-- Plugin: nvim-tree
+	["n|<leader>ni"] = map_cr([[lua require('nvim-tree.api').tree.toggle_git_ignored_filter()]])
+		:with_noremap()
+		:with_silent()
+		:with_desc("filetree: Toggle git-ignored files"),
 	-- Split navigation
 	["n|sh"] = map_cmd(":setlocal nosplitright<CR>:vsplit <C-R>=GetAbsFileDir()<CR>")
 		:with_noremap()
