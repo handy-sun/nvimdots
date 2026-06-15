@@ -4,7 +4,7 @@ local map_cr = bind.map_cr
 local map_cmd = bind.map_cmd
 local map_callback = bind.map_callback
 
-return {
+local mappings = {
 	-- Disable upstream visual line shift (replaced by custom)
 	["v|J"] = "",
 	["v|K"] = "",
@@ -80,3 +80,22 @@ return {
 	["i|<C-z>"] = map_cmd("<Esc>ui"):with_noremap():with_silent():with_desc("Undo"),
 	["i|<C-k>"] = map_cmd("<C-o>D"):with_noremap():with_silent():with_desc("Delete content behind block"),
 }
+
+-- Neovide: standard system clipboard shortcuts
+if vim.g.neovide then
+	-- Copy
+	mappings["v|<C-S-c>"] = map_cmd('"+y'):with_noremap():with_silent():with_desc("Neovide Copy")
+	-- Paste
+	mappings["n|<S-Insert>"] = map_cmd('"+P'):with_noremap():with_silent():with_desc("Neovide Paste (Normal)")
+	mappings["n|<C-S-v>"] = map_cmd('"+P'):with_noremap():with_silent():with_desc("Neovide Paste (Normal)")
+	mappings["v|<S-Insert>"] = map_cmd('"+P'):with_noremap():with_silent():with_desc("Neovide Paste (Visual)")
+	mappings["v|<C-S-v>"] = map_cmd('"+P'):with_noremap():with_silent():with_desc("Neovide Paste (Visual)")
+	mappings["i|<S-Insert>"] = map_cmd("<C-r>+"):with_noremap():with_silent():with_desc("Neovide Paste (Insert)")
+	mappings["i|<C-S-v>"] = map_cmd("<C-r>+"):with_noremap():with_silent():with_desc("Neovide Paste (Insert)")
+	mappings["c|<S-Insert>"] = map_cmd("<C-r>+"):with_noremap():with_silent():with_desc("Neovide Paste (Command)")
+	mappings["c|<C-S-v>"] = map_cmd("<C-r>+"):with_noremap():with_silent():with_desc("Neovide Paste (Command)")
+	mappings["t|<C-S-v>"] =
+		map_cmd([[<C-\><C-n>"+pi]]):with_noremap():with_silent():with_desc("Neovide Paste (Terminal)")
+end
+
+return mappings
