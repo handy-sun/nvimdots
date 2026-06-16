@@ -37,9 +37,11 @@ lua/
 │   ├── configs/    # 各插件的配置回调（结构与 plugins/ 镜像对应）
 │   └── utils/      # 公共工具函数
 ├── keymap/         # 按分类组织的按键映射（completion, editor, lang, tool, ui）
-├── user/           # 用户个人覆盖配置（不入上游版本控制）
-└── user_template/  # 新用户模板，复制到 lua/user/ 即可使用
+├── user/           # 维护者本人的覆盖配置（本 fork 中已纳入版本控制）
+└── user_template/  # 上游新用户模板（被 .gitignore 忽略，仅作参考）
 ```
+
+> **注意**：上游 ayamir/nvimdots 中 `lua/user/` 是个人配置（被忽略）、`user_template/` 是模板（被跟踪）。本 fork **反转**了这一约定——`.gitignore` 忽略 `lua/user_template`，而把维护者的 `lua/user/` 纳入版本控制。新增用户配置时直接写在 `lua/user/` 即可，会被提交。
 
 ### 插件系统 (`lua/core/pack.lua`)
 
@@ -56,6 +58,24 @@ lua/
 - **`load_plugin(name, opts)`** — 配置一个插件，自动检查 `user/configs/<文件名>.lua` 是否存在。用户可返回 table（与默认配置合并）、function（替换默认配置）或 `false`（禁用此插件）。
 
 用户的按键映射（`lua/user/keymap/`）通过 `require("modules.utils.keymap").replace()` 完全**替换**内置映射。
+
+### LSP 配置与服务器注册
+
+LSP 在 `lua/modules/configs/completion/lsp.lua` 中初始化，流程为：neoconf → mason → mason-lspconfig，随后 `pcall(require, "user.configs.lsp")` 加载用户的 LSP 配置，最后 `vim.cmd.LspStart`。
+
+- **`register_server(server, config)`**（`modules/utils/init.lua`）封装 Neovim 0.11+ 原生 API：先 `vim.lsp.config(server, config)` 再 `vim.lsp.enable(server)`。
+- mason 之外、仅 `nvim-lspconfig` 支持的服务器（如 dartls）在 `lsp.lua` 里手动注册，默认配置取 `completion.servers.<name>`，**用户可在 `user/configs/lsp-servers/<name>.lua` 提供覆盖**（存在则优先，与默认 `tbl_deep_extend("keep")` 合并）。
+- 维护者本人的 LSP 主配置位于 `lua/user/configs/lsp.lua`，通过 `register_server` + `start_on_filetype` 启动 clangd、lua_ls、nil 等。各服务器的默认 settings 在 `modules/configs/completion/servers/<name>.lua`。
+
+### 首次安装引导
+
+`lua/user/bootstrap.lua` 提供 headless 安装入口，等价于 vim-plug 时代的 `vim +PlugInstall +qall`：
+
+```sh
+nvim --headless -c "lua require('user.bootstrap')()"
+```
+
+它会 `Lazy! sync` 全部插件后自动退出，超时时间根据 GitHub 网络延迟和插件数量动态估算。注意它在 `init.lua` 之后通过 `-c` 运行，**不可**再次调用 `require("lazy").setup()`。
 
 ### 禁用与替换插件的陷阱
 
@@ -130,14 +150,18 @@ nix develop   # 设置 NVIM_APPNAME=nvimdots，将配置软链到 XDG_CONFIG_HOM
 
 ## 用户自定义
 
-要自定义此配置，从 `lua/user_template/` 复制文件到 `lua/user/` 后编辑即可。模板结构与模块目录镜像对应：
+本 fork 的 `lua/user/` 已存在且纳入版本控制，直接在其中编辑/新增文件即可（无需从 `user_template/` 复制）。`user_template/` 仅作为上游模板参考保留。目录结构与模块目录镜像对应：
 
 ```
 lua/user/
 ├── settings.lua              # 覆盖 core.settings
 ├── options.lua               # 覆盖 vim 选项
 ├── event.lua                 # 覆盖/新增自动命令
+├── bootstrap.lua             # headless 首次安装入口
 ├── keymap/                   # 替换按键映射（init.lua, completion.lua 等）
-├── plugins/                  # 新增插件声明
+├── plugins/                  # 新增插件声明（completion, editor, tool, ui）
 └── configs/                  # 覆盖插件配置
+    └── lsp-servers/          # 覆盖单个 LSP 服务器配置（如 jdtls.lua）
 ```
+
+新增插件的标准做法（以 lazydev.nvim 为例）：在 `user/plugins/<分类>.lua` 用仓库名为键声明插件，`config` 指向 `require("user.configs.<name>")`；配置文件返回一个 function，内部直接调 `require("<name>").setup({...})`。若要给**已有**插件追加选项（如给内置 cmp 加一个补全源），则在 `user/configs/<name>.lua` 返回一个 table，由 `load_plugin` 的 `tbl_recursive_merge` 合并（list 字段追加、dict 字段递归合并）。
