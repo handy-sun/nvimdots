@@ -46,7 +46,7 @@ return function()
 			"RainbowDelimiterRed",
 			"RainbowDelimiterOrange",
 			"RainbowDelimiterYellow",
-			"RainbowDelimiterGreen",
+			-- "RainbowDelimiterGreen",
 			"RainbowDelimiterBlue",
 			"RainbowDelimiterCyan",
 			"RainbowDelimiterViolet",
