@@ -102,9 +102,10 @@ local function nil_show_message_request_handler(err, params, ctx, config)
 	if
 		params
 		and params.message
-		and params.message:find("Fetching flake with inputs", 1, true)
+		and params.message:find("flake inputs", 1, true)
 		and params.actions
 		and params.actions[1]
+		and params.actions[1].ok
 	then
 		return params.actions[1]
 	end
