@@ -25,12 +25,16 @@ vim.opt.suffixes:append(".a,.1,.class")
 
 vim.cmd([[
 command! -nargs=+ -complete=file CpGrep execute 'silent grep! <args>' | copen 9 | redraw!
+ca w!! w !sudo tee "%"
 ]])
 
 local path_sep = vim.fn.has("win32") == 1 and "\\" or "/"
-vim.cmd(string.format([[function! GetAbsFileDir()
+vim.cmd(string.format(
+	[[function! GetAbsFileDir()
     return expand('%%:p:h') . '%s'
-endfunction]], path_sep))
+endfunction]],
+	path_sep
+))
 
 --- Auto-set cwd to project root using built-in vim.fs.root()
 local root_markers = { ".git", "package.json", "Makefile", "pyproject.toml", ".nvim.lua" }
