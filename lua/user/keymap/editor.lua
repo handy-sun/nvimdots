@@ -10,6 +10,8 @@ local mappings = {
 	["v|K"] = "",
 	-- Select all
 	["n|<leader>va"] = map_cmd("ggVG"):with_noremap():with_desc("Select all contents"),
+	-- e!
+	["n|<leader>e"] = map_cr("e!"):with_noremap():with_desc("edit: Reload buffer content"),
 	-- Suckless overrides
 	["n|n"] = map_cmd("'Nn'[v:searchforward]"):with_noremap():with_expr():with_desc("Always search forward"),
 	["n|N"] = map_cmd("'nN'[v:searchforward]"):with_noremap():with_expr():with_desc("Always search backward"),
