@@ -82,7 +82,10 @@ return {
 	-- Grep
 	["n|<Leader>cp"] = map_cmd(':CpGrep "" <C-R>=GetAbsFileDir()<CR><C-Left><Left><Left>')
 		:with_noremap()
-		:with_desc("command: Grep in the current directory"),
+		:with_desc("command: Grep in the current directory (no-ignore, exclude .git)"),
+	["n|<Leader>cP"] = map_cmd(':CpGrepGI "" <C-R>=GetAbsFileDir()<CR><C-Left><Left><Left>')
+		:with_noremap()
+		:with_desc("command: Grep in the current directory (respect .gitignore)"),
 	-- Command mode
 	["c|<C-t>"] = map_cmd("<C-R>=GetAbsFileDir()<CR>")
 		:with_noremap()

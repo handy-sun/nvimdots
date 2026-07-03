@@ -15,7 +15,8 @@ local options = {
 }
 
 if vim.fn.executable("rg") == 1 then
-	options["grepprg"] = "rg --hidden --vimgrep --smart-case -- "
+	-- <leader>cp default: -uu equals --no-ignore --hidden (ignore .gitignore/.ignore, include hidden files), but exclude the .git directory
+	options["grepprg"] = "rg -uu --glob=!.git --vimgrep --smart-case -- "
 else
 	options["grepprg"] = "grep --binary-files=without-match -irn $*"
 	options["grepformat"] = "%f:%l:%m,%f:%l%m,%f  %l%m"
@@ -25,6 +26,7 @@ vim.opt.suffixes:append(".a,.1,.class")
 
 vim.cmd([[
 command! -nargs=+ -complete=file CpGrep execute 'silent grep! <args>' | copen 9 | redraw!
+command! -nargs=+ -complete=file CpGrepGI let g:_cpgp=&grepprg | let &grepprg="rg --hidden --vimgrep --smart-case --" | execute 'silent grep! <args>' | let &grepprg=g:_cpgp | copen 9 | redraw!
 ca w!! w !sudo tee "%"
 ]])
 
