@@ -27,8 +27,12 @@ vim.opt.suffixes:append(".a,.1,.class")
 vim.cmd([[
 command! -nargs=+ -complete=file CpGrep execute 'silent grep! <args>' | copen 9 | redraw!
 command! -nargs=+ -complete=file CpGrepGI let g:_cpgp=&grepprg | let &grepprg="rg --hidden --vimgrep --smart-case --" | execute 'silent grep! <args>' | let &grepprg=g:_cpgp | copen 9 | redraw!
-ca w!! w !sudo tee "%"
 ]])
+
+-- Save a read-only file with sudo; only expands for an exact `:w!!`, not inside search
+vim.cmd(
+	[[cnoreabbrev <expr> w!! getcmdtype() ==# ':' && getcmdline() ==# 'w!!' ? 'w !sudo tee %:p:S >/dev/null' : 'w!!']]
+)
 
 local path_sep = vim.fn.has("win32") == 1 and "\\" or "/"
 vim.cmd(string.format(
