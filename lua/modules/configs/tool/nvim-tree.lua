@@ -119,7 +119,7 @@ return function()
 			dotfiles = false,
 			no_buffer = false,
 			git_clean = false,
-			git_ignored = true,
+			git_ignored = false,
 			no_bookmark = false,
 			custom = { ".DS_Store" },
 		},
