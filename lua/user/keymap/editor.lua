@@ -75,6 +75,11 @@ local mappings = {
 		:with_noremap()
 		:with_desc("edit: Wrap the selection with double quote"),
 	["n|<Leader>;"] = map_cmd("mzA;<ESC>`z"):with_noremap():with_desc("edit: Append a ';' after EOL"),
+	-- Command-line mode navigation
+	["c|<Home>"] = map_cmd("<C-b>"):with_noremap():with_silent():with_desc("Move cursor to command-line start"),
+	["c|<End>"] = map_cmd("<C-e>"):with_noremap():with_silent():with_desc("Move cursor to command-line end"),
+	["c|<Find>"] = map_cmd("<C-b>"):with_noremap():with_silent():with_desc("Move cursor to command-line start"),
+	["c|<Select>"] = map_cmd("<C-e>"):with_noremap():with_silent():with_desc("Move cursor to command-line end"),
 	-- Insert mode overrides
 	["i|<Find>"] = map_cmd("<Home>"):with_noremap():with_silent():with_desc("Move cursor to line start"),
 	["i|<Select>"] = map_cmd("<End>"):with_noremap():with_silent():with_desc("Move cursor to line end"),
