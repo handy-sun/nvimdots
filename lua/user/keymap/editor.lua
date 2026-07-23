@@ -17,7 +17,11 @@ local mappings = {
 	["n|N"] = map_cmd("'nN'[v:searchforward]"):with_noremap():with_expr():with_desc("Always search backward"),
 	-- Flash (replaces hop)
 	["nv|<leader>2"] = map_callback(function()
-			require("flash").jump()
+			require("flash").jump({
+				search = { mode = "search" },
+				label = { after = { 0, 0 } },
+				pattern = [[\<]],
+			})
 		end)
 		:with_noremap()
 		:with_silent()
