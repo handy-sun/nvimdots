@@ -73,7 +73,6 @@ settings["treesitter_deps"] = function()
 		"rust",
 		"sql",
 		"ssh_config",
-		"tmux",
 		"toml",
 		"typescript",
 		"vim",
