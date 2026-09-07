@@ -14,6 +14,12 @@ local options = {
 	wildignore = ".git,.hg,.svn,*.pyc,*.o,*.out,*.jpg,*.jpeg,*.png,*.gif,*.zip,**/tmp/**,*.DS_Store,**/node_modules/**,**/bower_modules/**,*build*",
 }
 
+-- Neovide: plain `y` copies to the system clipboard and `p` pastes from it with
+-- native vim semantics; terminal nvim keeps vanilla register behavior.
+if vim.g.neovide then
+	options.clipboard = "unnamedplus"
+end
+
 if vim.fn.executable("rg") == 1 then
 	-- <leader>cp default: -uu equals --no-ignore --hidden (ignore .gitignore/.ignore, include hidden files), but exclude the .git directory
 	options["grepprg"] = "rg -uu --glob=!.git --vimgrep --smart-case -- "
