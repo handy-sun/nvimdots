@@ -54,13 +54,15 @@ Branch info:
 
 | Branch | Supported Neovim version |
 | :----: | :----------------------: |
+|  0.13  |    nvim 0.13 nightly     |
 |  main  |     nvim 0.12 stable     |
-|  0.11  |     nvim 0.11 stable     |
+|  0.11  |        nvim 0.11         |
 |  0.10  |        nvim 0.10         |
-|  0.9   |         nvim 0.9         |
 
 </div>
 
+> [!IMPORTANT]
+> The `0.13` branch is intended for nightly Neovim builds and is **not** stable. It typically harbors subtle issues scattered throughout. Therefore, refrain from submitting issues if you happen to encounter them. They will be closed directly unless a viable solution is proposed or included.
 We currently manage plugins using [lazy.nvim](https://github.com/folke/lazy.nvim).
 
 Chinese introduction is [here](https://zhuanlan.zhihu.com/p/382092667).
