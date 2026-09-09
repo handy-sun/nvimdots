@@ -97,7 +97,6 @@ ui["folke/noice.nvim"] = {
 	dependencies = {
 		"MunifTanjim/nui.nvim",
 		"rcarriga/nvim-notify",
-		"hrsh7th/nvim-cmp",
 	},
 	config = function()
 		local boxed_message = "boxed_message"
