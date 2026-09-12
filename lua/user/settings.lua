@@ -5,6 +5,10 @@ local settings = {}
 settings["use_ssh"] = true
 
 settings["use_copilot"] = true
+--- 行内补全预测保持走 Copilot。上游合并(260909)把默认值改成了 "oai-compatible"
+--- (minuet-ai + opencode adapter + AI_API_KEY 环境变量),未设该变量时启动即报错,
+--- 且会把 Copilot 补全一起关掉,故显式覆盖回 copilot。
+settings["edit-prediction-source"] = "copilot"
 -- Set it to false if there are no need to format on save.
 ---@type boolean
 settings["format_on_save"] = false
