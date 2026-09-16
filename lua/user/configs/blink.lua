@@ -1,6 +1,21 @@
 -- 在上游 blink.cmp 默认配置之上恢复合并前(nvim-cmp 时代)的 cmdline 手感。
 -- 返回 function 而非 table:table 会经 tbl_recursive_merge 合并,list 字段是追加
 -- 而不是替换(keymap 命令表、menu.draw.columns 都会翻倍),function 直接改写 opts。
+
+-- Whether an item is a directory. Only the path source is trusted here: it tags
+-- directories with kind=Folder and data.type=="directory" (cmdline completes via
+-- cmdline+path, and the cmdline source is dropped for path completion below).
+local function is_directory_item(item)
+	if not item then
+		return false
+	end
+	if item.data and item.data.type == "directory" then
+		return true
+	end
+	local ok, types = pcall(require, "blink.cmp.types")
+	return ok and item.kind == types.CompletionItemKind.Folder
+end
+
 return function(opts)
 	-- nvim-cmp 时代:菜单打开无预选,首次 <C-n>/<Tab> 选中第 1 项并插入
 	-- (SelectBehavior.Insert);上游默认 preselect=true 导致首次按键跳到第 2 项。
@@ -8,8 +23,26 @@ return function(opts)
 
 	opts.cmdline.keymap = {
 		preset = "inherit",
-		-- 回车始终执行敲入的原样命令,不接受候选(nvim-cmp 的 cmdline preset 不映射 <CR>)
-		["<CR>"] = false,
+		-- <CR> on a selected directory means "descend into it": accept the item
+		-- (appending the trailing /), then immediately re-trigger completion to list
+		-- its contents, so you can keep drilling down. Everything else keeps the
+		-- nvim-cmp era behavior and executes the command as typed: no selection, a
+		-- file item, or a non-path completion.
+		-- To open the directory itself, hit <CR> once more -- the freshly shown menu
+		-- has no preselected item.
+		["<CR>"] = {
+			function(cmp)
+				if not cmp.is_menu_visible() or not is_directory_item(cmp.get_selected_item()) then
+					return false
+				end
+				return cmp.accept({
+					callback = function()
+						cmp.show()
+					end,
+				})
+			end,
+			"fallback",
+		},
 		-- 菜单可见时下一项/上一项,隐藏时手动唤出(对应 preset.cmdline 的 select/complete 二合一)
 		["<Tab>"] = { "select_next", "show", "fallback" },
 		["<S-Tab>"] = { "select_prev", "show", "fallback" },
