@@ -8,13 +8,16 @@
 let
   cfg = config.programs.neovim.nvimdots;
   inherit (lib) flip warn const;
-  inherit (lib.attrsets) optionalAttrs;
+  inherit (lib.attrsets) filterAttrs optionalAttrs;
+  inherit (lib.generators) toLua;
   inherit (lib.lists) optionals;
   inherit (lib.modules) mkIf;
   inherit (lib.options) mkEnableOption mkOption literalExpression;
   inherit (lib.strings) concatStringsSep versionOlder versionAtLeast;
   inherit (lib.types)
     listOf
+    nullOr
+    bool
     coercedTo
     package
     functionTo
@@ -42,6 +45,15 @@ in
           You need to unlink lazy-lock.json before enabling this option if `bindLazyLock` is set.
           Please refer to the wiki for details on the behavior.
         '';
+        useSsh = mkOption {
+          type = nullOr bool;
+          default = null;
+          example = false;
+          description = ''
+            Whether to clone lazy.nvim and plugins over SSH instead of HTTPS.
+            Overrides `settings["use_ssh"]` in the Lua config; `null` keeps the Lua value.
+          '';
+        };
         setBuildEnv = mkEnableOption ''
           Sets environment variables that resolve build dependencies as required by `mason.nvim` and `nvim-treesitter`
           Environment variables are only visible to `nvim` and have no effect on any parent sessions.
@@ -88,6 +100,11 @@ in
   };
   config =
     let
+      # Rendered to $XDG_CONFIG_HOME/nvim/nix-settings.lua and merged on top of `core.settings`.
+      nixSettings = filterAttrs (_: v: v != null) {
+        use_ssh = cfg.useSsh;
+      };
+
       # Inspired from https://github.com/NixOS/nixpkgs/blob/nixos-unstable/nixos/modules/programs/nix-ld.nix
       build-dependent-pkgs =
         builtins.filter (package: !package.meta.unsupported) [
@@ -146,6 +163,9 @@ in
         "nvim/lua".source = ../../lua;
         "nvim/snips".source = ../../snips;
         "nvim/tutor".source = ../../tutor;
+      }
+      // optionalAttrs (nixSettings != { }) {
+        "nvim/nix-settings.lua".text = "return ${toLua { } nixSettings}\n";
       }
       // optionalAttrs cfg.bindLazyLock {
         "nvim/lazy-lock.json".source = ../../lazy-lock.json;
