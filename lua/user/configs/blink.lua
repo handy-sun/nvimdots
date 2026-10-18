@@ -74,6 +74,12 @@ return function(opts)
 		end,
 	}
 
+	-- Keep hidden entries available for explicit path completion, such as `.ca`.
+	-- The path prefix still filters the list down to matching entries.
+	opts.sources.providers.path = vim.tbl_deep_extend("force", opts.sources.providers.path or {}, {
+		opts = { show_hidden_files_by_default = true },
+	})
+
 	-- 接回 <leader>tc 开关(user.cmdline_toggle)和 edit! 禁补全逻辑,
 	-- sources 是每次触发时调用的函数,改状态立即生效,无需重新 setup
 	local upstream_sources = opts.cmdline.sources
