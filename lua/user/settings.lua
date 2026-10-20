@@ -26,6 +26,10 @@ settings["neovide_config"] = {
 	remember_window_position = true,
 }
 
+settings["gui_config"] = {
+        font_size = vim.uv.os_uname().sysname == "Darwin" and 16 or 12,
+}
+
 -- plug: mason-lspconfig: ensure_installed used
 -- @type string[]
 settings["lsp_deps"] = function()
