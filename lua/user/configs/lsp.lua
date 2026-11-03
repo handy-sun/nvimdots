@@ -131,20 +131,24 @@ if clangd then
 			".git",
 		},
 		cmd = {
+			-- Drop include paths leaked by the outer shell and pin the locale to C:
+			-- clangd locates system headers by parsing `g++ -v`, and a localized gcc
+			-- never prints the markers it looks for, leaving <set> unresolved.
+			system_exepath("env") or "env",
+			"-u",
+			"CPATH",
+			"-u",
+			"CPLUS_INCLUDE_PATH",
+			"-u",
+			"C_INCLUDE_PATH",
+			"LC_ALL=C",
+			"LANG=C",
 			clangd,
 			"-j=9",
 			"--enable-config",
-			"--query-driver=" .. table.concat(
-				vim.tbl_filter(function(path)
-					return path ~= nil
-				end, {
-					system_exepath("clang++"),
-					system_exepath("clang"),
-					system_exepath("gcc"),
-					system_exepath("g++"),
-				}),
-				","
-			),
+			-- The compiler recorded in compile_commands.json lives in the nix store and
+			-- moves with nixpkgs, so allow any driver instead of listing paths.
+			"--query-driver=**",
 			"--all-scopes-completion",
 			"--background-index",
 			"--clang-tidy",
